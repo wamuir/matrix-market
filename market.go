@@ -8,22 +8,22 @@ import (
 const matrixMktBanner = `%%MatrixMarket`
 
 const (
-	MM_MTX_STR = "matrix"
+	mtxObjectMatrix = "matrix"
 
-	MM_ARRAY_STR      = "array"
-	MM_COORDINATE_STR = "coordinate"
-	MM_DENSE_STR      = "array"
-	MM_SPARSE_STR     = "coordinate"
+	mtxFormatArray      = "array"
+	mtxFormatCoordinate = "coordinate"
+	mtxFormatDense      = "array"
+	mtxFormatSparse     = "coordinate"
 
-	MM_COMPLEX_STR = "complex"
-	MM_INT_STR     = "integer"
-	MM_PATTERN_STR = "pattern"
-	MM_REAL_STR    = "real"
+	mtxFieldComplex = "complex"
+	mtxFieldInteger = "integer"
+	mtxFieldPattern = "pattern"
+	mtxFieldReal    = "real"
 
-	MM_GENERAL_STR = "general"
-	MM_HERM_STR    = "hermitian"
-	MM_SKEW_STR    = "skew-symmetric"
-	MM_SYMM_STR    = "symmetric"
+	mtxSymmetryGeneral   = "general"
+	mtxSymmetryHermitian = "hermitian"
+	mtxSymmetrySkew      = "skew-symmetric"
+	mtxSymmetrySymm      = "symmetric"
 )
 
 type header struct {
@@ -52,19 +52,19 @@ type Matrix interface {
 	ToSparse() *sparse.DOK
 }
 
-func (h *header) isMatrix() bool     { return h.Object == MM_MTX_STR }
-func (h *header) isArray() bool      { return h.Format == MM_ARRAY_STR }
-func (h *header) isCoordinate() bool { return h.Format == MM_COORDINATE_STR }
-func (h *header) isDense() bool      { return h.Format == MM_DENSE_STR }
-func (h *header) isSparse() bool     { return h.Format == MM_SPARSE_STR }
-func (h *header) isComplex() bool    { return h.Field == MM_COMPLEX_STR }
-func (h *header) isInteger() bool    { return h.Field == MM_INT_STR }
-func (h *header) isPattern() bool    { return h.Field == MM_PATTERN_STR }
-func (h *header) isReal() bool       { return h.Field == MM_REAL_STR }
-func (h *header) isGeneral() bool    { return h.Symmetry == MM_GENERAL_STR }
-func (h *header) isHermitian() bool  { return h.Symmetry == MM_HERM_STR }
-func (h *header) isSkew() bool       { return h.Symmetry == MM_SKEW_STR }
-func (h *header) isSymmetric() bool  { return h.Symmetry == MM_SYMM_STR }
+func (h *header) isMatrix() bool     { return h.Object == mtxObjectMatrix }
+func (h *header) isArray() bool      { return h.Format == mtxFormatArray }
+func (h *header) isCoordinate() bool { return h.Format == mtxFormatCoordinate }
+func (h *header) isDense() bool      { return h.Format == mtxFormatDense }
+func (h *header) isSparse() bool     { return h.Format == mtxFormatSparse }
+func (h *header) isComplex() bool    { return h.Field == mtxFieldComplex }
+func (h *header) isInteger() bool    { return h.Field == mtxFieldInteger }
+func (h *header) isPattern() bool    { return h.Field == mtxFieldPattern }
+func (h *header) isReal() bool       { return h.Field == mtxFieldReal }
+func (h *header) isGeneral() bool    { return h.Symmetry == mtxSymmetryGeneral }
+func (h *header) isHermitian() bool  { return h.Symmetry == mtxSymmetryHermitian }
+func (h *header) isSkew() bool       { return h.Symmetry == mtxSymmetrySkew }
+func (h *header) isSymmetric() bool  { return h.Symmetry == mtxSymmetrySymm }
 
 // Equals tests equality of two matrix market headers
 func (h *header) equals(j header) bool {
