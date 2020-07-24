@@ -5,7 +5,7 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-const MatrixMktBanner = `%%MatrixMarket`
+const matrixMktBanner = `%%MatrixMarket`
 
 const (
 	MM_MTX_STR = "matrix"

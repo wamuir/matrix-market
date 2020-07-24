@@ -61,7 +61,7 @@ func mm_scan_header(scanner *bufio.Scanner) (*header, error) {
 		return nil, PREMATURE_EOF
 	}
 
-	if banner != MatrixMktBanner {
+	if banner != matrixMktBanner {
 		return nil, NO_HEADER
 	}
 
