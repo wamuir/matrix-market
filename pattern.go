@@ -7,13 +7,13 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-type mm_coordinate_pattern struct {
+type mtxCoordinatePattern struct {
 	Header header
 	M, N   int
 	I, J   []int
 }
 
-func (m mm_coordinate_pattern) scan_element(k int, line string) error {
+func (m mtxCoordinatePattern) scan_element(k int, line string) error {
 
 	var i, j int
 
@@ -28,13 +28,13 @@ func (m mm_coordinate_pattern) scan_element(k int, line string) error {
 	return nil
 }
 
-func (m mm_coordinate_pattern) ToDense() mat.Matrix {
+func (m mtxCoordinatePattern) ToDense() mat.Matrix {
 
 	sparse := m.ToSparse()
 	return sparse.ToDense()
 }
 
-func (m mm_coordinate_pattern) ToSparse() *sparse.DOK {
+func (m mtxCoordinatePattern) ToSparse() *sparse.DOK {
 
 	dok := sparse.NewDOK(m.M, m.N)
 

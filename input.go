@@ -206,7 +206,7 @@ func Read(r io.Reader) (Matrix, error) {
 
 	case hdr.isArray() && hdr.isInteger():
 
-		matrix = &mm_array_int{
+		matrix = &mtxArrayInt{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,
@@ -215,7 +215,7 @@ func Read(r io.Reader) (Matrix, error) {
 
 	case hdr.isArray() && hdr.isReal():
 
-		matrix = &mm_array_real{
+		matrix = &mtxArrayReal{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,
@@ -224,7 +224,7 @@ func Read(r io.Reader) (Matrix, error) {
 
 	case hdr.isCoordinate() && hdr.isInteger():
 
-		matrix = &mm_coordinate_int{
+		matrix = &mtxCoordinateInt{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,
@@ -235,7 +235,7 @@ func Read(r io.Reader) (Matrix, error) {
 
 	case hdr.isCoordinate() && hdr.isPattern():
 
-		matrix = &mm_coordinate_pattern{
+		matrix = &mtxCoordinatePattern{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,
@@ -245,7 +245,7 @@ func Read(r io.Reader) (Matrix, error) {
 
 	case hdr.isCoordinate() && hdr.isReal():
 
-		matrix = &mm_coordinate_real{
+		matrix = &mtxCoordinateReal{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,
@@ -319,7 +319,7 @@ func ReadComplex(r io.Reader) (CMatrix, error) {
 
 	case hdr.isArray():
 
-		matrix = &mm_array_complex{
+		matrix = &mtxArrayComplex{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,
@@ -328,7 +328,7 @@ func ReadComplex(r io.Reader) (CMatrix, error) {
 
 	case hdr.isCoordinate():
 
-		matrix = &mm_coordinate_complex{
+		matrix = &mtxCoordinateComplex{
 			Header: *hdr,
 			M:      idx.M,
 			N:      idx.N,

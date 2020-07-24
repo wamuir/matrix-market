@@ -6,20 +6,20 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-type mm_array_complex struct {
+type mtxArrayComplex struct {
 	Header header
 	M, N   int
 	V      []complex128
 }
 
-type mm_coordinate_complex struct {
+type mtxCoordinateComplex struct {
 	Header header
 	M, N   int
 	I, J   []int
 	V      []complex128
 }
 
-func (m mm_array_complex) scan_element(k int, line string) error {
+func (m mtxArrayComplex) scan_element(k int, line string) error {
 
 	var (
 		a, b float64 // real, imaginary
@@ -35,12 +35,12 @@ func (m mm_array_complex) scan_element(k int, line string) error {
 	return nil
 }
 
-func (m mm_array_complex) ToDense() mat.CMatrix {
+func (m mtxArrayComplex) ToDense() mat.CMatrix {
 
 	return mat.NewCDense(m.M, m.N, m.V)
 }
 
-func (m mm_coordinate_complex) scan_element(k int, line string) error {
+func (m mtxCoordinateComplex) scan_element(k int, line string) error {
 
 	var (
 		i, j int
@@ -59,7 +59,7 @@ func (m mm_coordinate_complex) scan_element(k int, line string) error {
 	return nil
 }
 
-func (m mm_coordinate_complex) ToDense() mat.CMatrix {
+func (m mtxCoordinateComplex) ToDense() mat.CMatrix {
 
 	dense := mat.NewCDense(m.M, m.N, nil)
 	for k, v := range m.V {

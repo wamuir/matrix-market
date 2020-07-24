@@ -7,20 +7,20 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-type mm_array_real struct {
+type mtxArrayReal struct {
 	Header header
 	M, N   int
 	V      []float64
 }
 
-type mm_coordinate_real struct {
+type mtxCoordinateReal struct {
 	Header header
 	M, N   int
 	I, J   []int
 	V      []float64
 }
 
-func (m mm_array_real) scan_element(k int, line string) error {
+func (m mtxArrayReal) scan_element(k int, line string) error {
 
 	_, err := fmt.Sscanf(line, "%f", &m.V[k])
 	if err != nil {
@@ -30,7 +30,7 @@ func (m mm_array_real) scan_element(k int, line string) error {
 	return nil
 }
 
-func (m mm_array_real) ToDense() mat.Matrix {
+func (m mtxArrayReal) ToDense() mat.Matrix {
 
 	dense := mat.NewDense(m.M, m.N, nil)
 
@@ -41,7 +41,7 @@ func (m mm_array_real) ToDense() mat.Matrix {
 	return dense
 }
 
-func (m mm_array_real) ToSparse() *sparse.DOK {
+func (m mtxArrayReal) ToSparse() *sparse.DOK {
 
 	dok := sparse.NewDOK(m.M, m.N)
 
@@ -54,7 +54,7 @@ func (m mm_array_real) ToSparse() *sparse.DOK {
 	return dok
 }
 
-func (m mm_coordinate_real) scan_element(k int, line string) error {
+func (m mtxCoordinateReal) scan_element(k int, line string) error {
 
 	var i, j int
 
@@ -69,13 +69,13 @@ func (m mm_coordinate_real) scan_element(k int, line string) error {
 	return nil
 }
 
-func (m mm_coordinate_real) ToDense() mat.Matrix {
+func (m mtxCoordinateReal) ToDense() mat.Matrix {
 
 	sparse := m.ToSparse()
 	return sparse.ToDense()
 }
 
-func (m mm_coordinate_real) ToSparse() *sparse.DOK {
+func (m mtxCoordinateReal) ToSparse() *sparse.DOK {
 
 	dok := sparse.NewDOK(m.M, m.N)
 
