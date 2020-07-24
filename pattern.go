@@ -13,7 +13,7 @@ type mtxCoordinatePattern struct {
 	I, J   []int
 }
 
-func (m mtxCoordinatePattern) scan_element(k int, line string) error {
+func (m mtxCoordinatePattern) scanElement(k int, line string) error {
 
 	var i, j int
 

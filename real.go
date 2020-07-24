@@ -20,7 +20,7 @@ type mtxCoordinateReal struct {
 	V      []float64
 }
 
-func (m mtxArrayReal) scan_element(k int, line string) error {
+func (m mtxArrayReal) scanElement(k int, line string) error {
 
 	_, err := fmt.Sscanf(line, "%f", &m.V[k])
 	if err != nil {
@@ -54,7 +54,7 @@ func (m mtxArrayReal) ToSparse() *sparse.DOK {
 	return dok
 }
 
-func (m mtxCoordinateReal) scan_element(k int, line string) error {
+func (m mtxCoordinateReal) scanElement(k int, line string) error {
 
 	var i, j int
 

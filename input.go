@@ -44,7 +44,7 @@ var supported = []header{
 	{MM_MTX_STR, MM_COORDINATE_STR, MM_PATTERN_STR, MM_SYMM_STR},
 }
 
-func mm_scan_header(scanner *bufio.Scanner) (*header, error) {
+func mtxScanHeader(scanner *bufio.Scanner) (*header, error) {
 
 	if ok := scanner.Scan(); !ok {
 		return nil, ErrInputScanError
@@ -79,17 +79,17 @@ func mm_scan_header(scanner *bufio.Scanner) (*header, error) {
 	return &h, nil
 }
 
-func mm_scan_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
+func mtxScanIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
 
 	switch {
 
 	case hdr.isArray():
 
-		return mm_scan_array_index(scanner, hdr)
+		return mtxScanArrayIndex(scanner, hdr)
 
 	case hdr.isCoordinate():
 
-		return mm_scan_coordinate_index(scanner, hdr)
+		return mtxScanCoordinateIndex(scanner, hdr)
 
 	default:
 
@@ -98,7 +98,7 @@ func mm_scan_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
 	}
 }
 
-func mm_scan_array_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
+func mtxScanArrayIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
 
 	var idx index
 
@@ -134,7 +134,7 @@ func mm_scan_array_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
 
 }
 
-func mm_scan_coordinate_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
+func mtxScanCoordinateIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
 
 	var idx index
 
@@ -186,13 +186,13 @@ func Read(r io.Reader) (Matrix, error) {
 	scanner := makeScanner(r)
 
 	// read header
-	hdr, err := mm_scan_header(scanner)
+	hdr, err := mtxScanHeader(scanner)
 	if err != nil {
 		return nil, err
 	}
 
 	// read index
-	idx, err := mm_scan_index(scanner, hdr)
+	idx, err := mtxScanIndex(scanner, hdr)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +271,7 @@ func Read(r io.Reader) (Matrix, error) {
 			return nil, ErrInputScanError
 		}
 
-		if err := matrix.scan_element(k, line); err != nil {
+		if err := matrix.scanElement(k, line); err != nil {
 			return nil, err
 		}
 
@@ -299,13 +299,13 @@ func ReadComplex(r io.Reader) (CMatrix, error) {
 	scanner := makeScanner(r)
 
 	// read header
-	hdr, err := mm_scan_header(scanner)
+	hdr, err := mtxScanHeader(scanner)
 	if err != nil {
 		return nil, err
 	}
 
 	// read index
-	idx, err := mm_scan_index(scanner, hdr)
+	idx, err := mtxScanIndex(scanner, hdr)
 	if err != nil {
 		return nil, err
 	}

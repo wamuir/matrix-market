@@ -41,13 +41,13 @@ type index struct {
 
 // CMatrix is a basic matrix interface type for complex matrices.
 type CMatrix interface {
-	scan_element(int, string) error
+	scanElement(int, string) error
 	ToDense() mat.CMatrix
 }
 
 // Matrix is a basic matrix interface type for matrices.
 type Matrix interface {
-	scan_element(int, string) error
+	scanElement(int, string) error
 	ToDense() mat.Matrix
 	ToSparse() *sparse.DOK
 }

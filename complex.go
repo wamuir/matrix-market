@@ -19,7 +19,7 @@ type mtxCoordinateComplex struct {
 	V      []complex128
 }
 
-func (m mtxArrayComplex) scan_element(k int, line string) error {
+func (m mtxArrayComplex) scanElement(k int, line string) error {
 
 	var (
 		a, b float64 // real, imaginary
@@ -40,7 +40,7 @@ func (m mtxArrayComplex) ToDense() mat.CMatrix {
 	return mat.NewCDense(m.M, m.N, m.V)
 }
 
-func (m mtxCoordinateComplex) scan_element(k int, line string) error {
+func (m mtxCoordinateComplex) scanElement(k int, line string) error {
 
 	var (
 		i, j int
