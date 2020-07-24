@@ -32,17 +32,17 @@ func Test_mm_read_header(t *testing.T) {
 	}
 
 	// malformed banner
-	if h, err := mm_scan_header(sts(`MatrixMarket matrix coordinate integer general`)); err != NO_HEADER {
+	if h, err := mm_scan_header(sts(`MatrixMarket matrix coordinate integer general`)); err != ErrNoHeader {
 		t.Errorf("Expected NO_HEADER error, received %v, %v", h, err)
 	}
 
 	// invalid field combination (real and hermitian)
-	if h, err := mm_scan_header(sts(`%%MatrixMarket matrix coordinate real hermitian`)); err != UNSUPPORTED_TYPE {
+	if h, err := mm_scan_header(sts(`%%MatrixMarket matrix coordinate real hermitian`)); err != ErrUnsupportedType {
 		t.Errorf("Expected UNSUPPORTED_TYPE error, received %v, %v", h, err)
 	}
 
 	// invalid field combination (array and pattern)
-	if h, err := mm_scan_header(sts(`%%MatrixMarket matrix array pattern general`)); err != UNSUPPORTED_TYPE {
+	if h, err := mm_scan_header(sts(`%%MatrixMarket matrix array pattern general`)); err != ErrUnsupportedType {
 		t.Errorf("Expected UNSUPPORTED_TYPE error, received %v, %v", h, err)
 	}
 
