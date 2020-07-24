@@ -1,0 +1,19 @@
+language: go
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+go_import_path: github.com/wamuir/matrix-market
+
+go:
+  - 1.14.x
+  - tip
+
+before_install:
+  - go get -u github.com/james-bowman/sparse
+  - go get -u gonum.org/v1/gonum/mat 
