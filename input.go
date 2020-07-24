@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const MaxScanTokenSize = 64 * 1024
+const maxScanTokenSize = 64 * 1024
 
 // Errors returned by failures to read a matrix
 var (
@@ -171,8 +171,8 @@ func makeScanner(r io.Reader) *bufio.Scanner {
 
 	scanner := bufio.NewScanner(r)
 
-	buf := make([]byte, MaxScanTokenSize)
-	scanner.Buffer(buf, MaxScanTokenSize)
+	buf := make([]byte, maxScanTokenSize)
+	scanner.Buffer(buf, maxScanTokenSize)
 
 	return scanner
 
