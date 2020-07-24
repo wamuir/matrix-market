@@ -35,9 +35,9 @@ exchanging matrix data.
       log.Fatal(err)
   }
 
-  var dok sparse.DOK = mtx.ToSparse() // github.com/james-bowman/sparse
+  var dok *sparse.DOK = mtx.ToSparse()  // github.com/james-bowman/sparse
 
-  var arr mat.Matrix = mtx.ToDense()  // gonum.org/v1/gonum/mat
+  var arr mat.Matrix = mtx.ToDense()    // gonum.org/v1/gonum/mat
 ```
 
 # See also
