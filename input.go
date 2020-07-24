@@ -9,14 +9,14 @@ import (
 
 const MaxScanTokenSize = 64 * 1024
 
+// Errors returned by failures to read a matrix
 var (
-	INPUT_SCAN_ERROR = fmt.Errorf("error while scanning matrix input") // 11
-	LINE_TOO_LONG    = fmt.Errorf("input line exceed maximum length ") // 16
-	PREMATURE_EOF    = fmt.Errorf("required header items are missing") // 12
-	NO_HEADER        = fmt.Errorf("missing matrix market header line") // 14
-	NOT_MTX          = fmt.Errorf("input is not a matrix market")      // 13
-	UNSUPPORTED_TYPE = fmt.Errorf("unrecognizable matrix description") // 15
-	UNWRITABLE       = fmt.Errorf("unable to write matrix to file")    // 17
+	ErrInputScanError  = fmt.Errorf("error while scanning matrix input")
+	ErrLineTooLong     = fmt.Errorf("input line exceed maximum length ")
+	ErrPrematureEOF    = fmt.Errorf("required header items are missing")
+	ErrNoHeader        = fmt.Errorf("missing matrix market header line")
+	ErrNotMTX          = fmt.Errorf("input is not a matrix market")
+	ErrUnsupportedType = fmt.Errorf("unrecognizable matrix description")
 )
 
 var supported = []header{
@@ -47,7 +47,7 @@ var supported = []header{
 func mm_scan_header(scanner *bufio.Scanner) (*header, error) {
 
 	if ok := scanner.Scan(); !ok {
-		return nil, INPUT_SCAN_ERROR
+		return nil, ErrInputScanError
 	}
 
 	var banner, object, format, field, symm string
@@ -58,11 +58,11 @@ func mm_scan_header(scanner *bufio.Scanner) (*header, error) {
 	}
 
 	if n != 5 {
-		return nil, PREMATURE_EOF
+		return nil, ErrPrematureEOF
 	}
 
 	if banner != matrixMktBanner {
-		return nil, NO_HEADER
+		return nil, ErrNoHeader
 	}
 
 	h := header{
@@ -73,7 +73,7 @@ func mm_scan_header(scanner *bufio.Scanner) (*header, error) {
 	}
 
 	if !h.isValid() {
-		return nil, UNSUPPORTED_TYPE
+		return nil, ErrUnsupportedType
 	}
 
 	return &h, nil
@@ -93,7 +93,7 @@ func mm_scan_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
 
 	default:
 
-		return nil, UNSUPPORTED_TYPE
+		return nil, ErrUnsupportedType
 
 	}
 }
@@ -117,7 +117,7 @@ func mm_scan_array_index(scanner *bufio.Scanner, hdr *header) (*index, error) {
 		}
 
 		if n != 2 {
-			return nil, INPUT_SCAN_ERROR
+			return nil, ErrInputScanError
 		}
 
 		idx.L = idx.M * idx.N
@@ -153,7 +153,7 @@ func mm_scan_coordinate_index(scanner *bufio.Scanner, hdr *header) (*index, erro
 		}
 
 		if n != 3 {
-			return nil, INPUT_SCAN_ERROR
+			return nil, ErrInputScanError
 		}
 
 		break
@@ -202,7 +202,7 @@ func Read(r io.Reader) (Matrix, error) {
 
 	case hdr.isComplex():
 
-		return nil, UNSUPPORTED_TYPE
+		return nil, ErrUnsupportedType
 
 	case hdr.isArray() && hdr.isInteger():
 
@@ -268,7 +268,7 @@ func Read(r io.Reader) (Matrix, error) {
 		// error out if data rows exceed expected non-zero entries
 		// (note that k is zero indexed)
 		if k == idx.L {
-			return nil, INPUT_SCAN_ERROR
+			return nil, ErrInputScanError
 		}
 
 		if err := matrix.scan_element(k, line); err != nil {
@@ -285,7 +285,7 @@ func Read(r io.Reader) (Matrix, error) {
 	// check if number of non-empty rows read is equal to expected
 	// count of non-zero rows
 	if k != idx.L {
-		return nil, INPUT_SCAN_ERROR
+		return nil, ErrInputScanError
 	}
 
 	return matrix, nil
@@ -315,7 +315,7 @@ func ReadComplex(r io.Reader) (CMatrix, error) {
 
 	case !(hdr.isComplex()):
 
-		return nil, UNSUPPORTED_TYPE
+		return nil, ErrUnsupportedType
 
 	case hdr.isArray():
 
