@@ -2,11 +2,6 @@ language: go
 
 os:
   - linux
-  - osx
-
-compiler:
-  - gcc
-  - clang
 
 go_import_path: github.com/wamuir/matrix-market
 
