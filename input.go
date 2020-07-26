@@ -6,43 +6,6 @@ import (
 	"io"
 )
 
-const maxScanTokenSize = 64 * 1024
-
-// Errors returned by failures to read a matrix
-var (
-	ErrInputScanError  = fmt.Errorf("error while scanning matrix input")
-	ErrLineTooLong     = fmt.Errorf("input line exceed maximum length ")
-	ErrPrematureEOF    = fmt.Errorf("required header items are missing")
-	ErrNoHeader        = fmt.Errorf("missing matrix market header line")
-	ErrNotMTX          = fmt.Errorf("input is not a matrix market")
-	ErrUnsupportedType = fmt.Errorf("unrecognizable matrix description")
-)
-
-var supported = []mmType{
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetryHermitian},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetryHermitian},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetrySymm},
-}
-
 func mtxScanIndex(scanner *bufio.Scanner, t *mmType) (*index, error) {
 
 	switch {
