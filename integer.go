@@ -8,13 +8,13 @@ import (
 )
 
 type mtxArrayInt struct {
-	Header header
+	Header mmType
 	M, N   int
 	V      []int
 }
 
 type mtxCoordinateInt struct {
-	Header header
+	Header mmType
 	M, N   int
 	I, J   []int
 	V      []int

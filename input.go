@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"strings"
 )
 
 const maxScanTokenSize = 64 * 1024
@@ -19,7 +18,7 @@ var (
 	ErrUnsupportedType = fmt.Errorf("unrecognizable matrix description")
 )
 
-var supported = []header{
+var supported = []mmType{
 	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetryGeneral},
 	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySymm},
 	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySkew},
@@ -44,52 +43,17 @@ var supported = []header{
 	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetrySymm},
 }
 
-func mtxScanHeader(scanner *bufio.Scanner) (*header, error) {
-
-	if ok := scanner.Scan(); !ok {
-		return nil, ErrInputScanError
-	}
-
-	var banner, object, format, field, symm string
-
-	n, err := fmt.Sscan(scanner.Text(), &banner, &object, &format, &field, &symm)
-	if err != nil {
-		return nil, err
-	}
-
-	if n != 5 {
-		return nil, ErrPrematureEOF
-	}
-
-	if banner != matrixMktBanner {
-		return nil, ErrNoHeader
-	}
-
-	h := header{
-		Object:   strings.ToLower(object),
-		Format:   strings.ToLower(format),
-		Field:    strings.ToLower(field),
-		Symmetry: strings.ToLower(symm),
-	}
-
-	if !h.isValid() {
-		return nil, ErrUnsupportedType
-	}
-
-	return &h, nil
-}
-
-func mtxScanIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
+func mtxScanIndex(scanner *bufio.Scanner, t *mmType) (*index, error) {
 
 	switch {
 
-	case hdr.isArray():
+	case t.isArray():
 
-		return mtxScanArrayIndex(scanner, hdr)
+		return mtxScanArrayIndex(scanner, t)
 
-	case hdr.isCoordinate():
+	case t.isCoordinate():
 
-		return mtxScanCoordinateIndex(scanner, hdr)
+		return mtxScanCoordinateIndex(scanner, t)
 
 	default:
 
@@ -98,7 +62,7 @@ func mtxScanIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
 	}
 }
 
-func mtxScanArrayIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
+func mtxScanArrayIndex(scanner *bufio.Scanner, t *mmType) (*index, error) {
 
 	var idx index
 
@@ -134,7 +98,7 @@ func mtxScanArrayIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
 
 }
 
-func mtxScanCoordinateIndex(scanner *bufio.Scanner, hdr *header) (*index, error) {
+func mtxScanCoordinateIndex(scanner *bufio.Scanner, t *mmType) (*index, error) {
 
 	var idx index
 
@@ -186,13 +150,13 @@ func Read(r io.Reader) (Matrix, error) {
 	scanner := makeScanner(r)
 
 	// read header
-	hdr, err := mtxScanHeader(scanner)
+	t, err := scanHeader(scanner)
 	if err != nil {
 		return nil, err
 	}
 
 	// read index
-	idx, err := mtxScanIndex(scanner, hdr)
+	idx, err := mtxScanIndex(scanner, t)
 	if err != nil {
 		return nil, err
 	}
@@ -200,32 +164,32 @@ func Read(r io.Reader) (Matrix, error) {
 	// read data
 	switch {
 
-	case hdr.isComplex():
+	case t.isComplex():
 
 		return nil, ErrUnsupportedType
 
-	case hdr.isArray() && hdr.isInteger():
+	case t.isArray() && t.isInteger():
 
 		matrix = &mtxArrayInt{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			V:      make([]int, idx.L),
 		}
 
-	case hdr.isArray() && hdr.isReal():
+	case t.isArray() && t.isReal():
 
 		matrix = &mtxArrayReal{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			V:      make([]float64, idx.L),
 		}
 
-	case hdr.isCoordinate() && hdr.isInteger():
+	case t.isCoordinate() && t.isInteger():
 
 		matrix = &mtxCoordinateInt{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			I:      make([]int, idx.L),
@@ -233,20 +197,20 @@ func Read(r io.Reader) (Matrix, error) {
 			V:      make([]int, idx.L),
 		}
 
-	case hdr.isCoordinate() && hdr.isPattern():
+	case t.isCoordinate() && t.isPattern():
 
 		matrix = &mtxCoordinatePattern{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			I:      make([]int, idx.L),
 			J:      make([]int, idx.L),
 		}
 
-	case hdr.isCoordinate() && hdr.isReal():
+	case t.isCoordinate() && t.isReal():
 
 		matrix = &mtxCoordinateReal{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			I:      make([]int, idx.L),
@@ -299,13 +263,13 @@ func ReadComplex(r io.Reader) (CMatrix, error) {
 	scanner := makeScanner(r)
 
 	// read header
-	hdr, err := mtxScanHeader(scanner)
+	t, err := scanHeader(scanner)
 	if err != nil {
 		return nil, err
 	}
 
 	// read index
-	idx, err := mtxScanIndex(scanner, hdr)
+	idx, err := mtxScanIndex(scanner, t)
 	if err != nil {
 		return nil, err
 	}
@@ -313,23 +277,23 @@ func ReadComplex(r io.Reader) (CMatrix, error) {
 	// read data
 	switch {
 
-	case !(hdr.isComplex()):
+	case !(t.isComplex()):
 
 		return nil, ErrUnsupportedType
 
-	case hdr.isArray():
+	case t.isArray():
 
 		matrix = &mtxArrayComplex{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			V:      make([]complex128, idx.L),
 		}
 
-	case hdr.isCoordinate():
+	case t.isCoordinate():
 
 		matrix = &mtxCoordinateComplex{
-			Header: *hdr,
+			Header: *t,
 			M:      idx.M,
 			N:      idx.N,
 			I:      make([]int, idx.L),

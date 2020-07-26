@@ -7,13 +7,13 @@ import (
 )
 
 type mtxArrayComplex struct {
-	Header header
+	Header mmType
 	M, N   int
 	V      []complex128
 }
 
 type mtxCoordinateComplex struct {
-	Header header
+	Header mmType
 	M, N   int
 	I, J   []int
 	V      []complex128

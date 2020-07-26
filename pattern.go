@@ -8,7 +8,7 @@ import (
 )
 
 type mtxCoordinatePattern struct {
-	Header header
+	Header mmType
 	M, N   int
 	I, J   []int
 }

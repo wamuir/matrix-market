@@ -17,37 +17,37 @@ func sts(s string) *bufio.Scanner {
 func TestmtxReadHeader(t *testing.T) {
 
 	// valid header
-	if _, err := mtxScanHeader(sts(`%%MatrixMarket matrix coordinate integer general`)); err != nil {
+	if _, err := scanHeader(sts(`%%MatrixMarket matrix coordinate integer general`)); err != nil {
 		t.Errorf(err.Error())
 	}
 
 	// empty header
-	if h, err := mtxScanHeader(sts(``)); err == nil {
+	if h, err := scanHeader(sts(``)); err == nil {
 		t.Errorf("Expected EOF error, received %v, %v", h, err)
 	}
 
 	// object field missing from header
-	if h, err := mtxScanHeader(sts(`%%MatrixMarket coordinate integer general`)); err == nil {
+	if h, err := scanHeader(sts(`%%MatrixMarket coordinate integer general`)); err == nil {
 		t.Errorf("Expected EOF error, received %v, %v", h, err)
 	}
 
 	// malformed banner
-	if h, err := mtxScanHeader(sts(`MatrixMarket matrix coordinate integer general`)); err != ErrNoHeader {
+	if h, err := scanHeader(sts(`MatrixMarket matrix coordinate integer general`)); err != ErrNoHeader {
 		t.Errorf("Expected NO_HEADER error, received %v, %v", h, err)
 	}
 
 	// invalid field combination (real and hermitian)
-	if h, err := mtxScanHeader(sts(`%%MatrixMarket matrix coordinate real hermitian`)); err != ErrUnsupportedType {
+	if h, err := scanHeader(sts(`%%MatrixMarket matrix coordinate real hermitian`)); err != ErrUnsupportedType {
 		t.Errorf("Expected UNSUPPORTED_TYPE error, received %v, %v", h, err)
 	}
 
 	// invalid field combination (array and pattern)
-	if h, err := mtxScanHeader(sts(`%%MatrixMarket matrix array pattern general`)); err != ErrUnsupportedType {
+	if h, err := scanHeader(sts(`%%MatrixMarket matrix array pattern general`)); err != ErrUnsupportedType {
 		t.Errorf("Expected UNSUPPORTED_TYPE error, received %v, %v", h, err)
 	}
 
 	// superfluous field(s) in header (expect to be discarded)
-	if h, err := mtxScanHeader(sts(`%%MatrixMarket matrix coordinate integer general extra`)); err != nil {
+	if h, err := scanHeader(sts(`%%MatrixMarket matrix coordinate integer general extra`)); err != nil {
 		t.Errorf("Expected nil error, received %v, %v", h, err)
 	}
 
