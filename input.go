@@ -106,9 +106,9 @@ func makeScanner(r io.Reader) *bufio.Scanner {
 }
 
 // Read reads Matrix Market inputs from an io.Reader
-func Read(r io.Reader) (Matrix, error) {
+func Read(r io.Reader) (MM, error) {
 
-	var matrix Matrix
+	var matrix MM
 
 	scanner := makeScanner(r)
 
@@ -219,9 +219,9 @@ func Read(r io.Reader) (Matrix, error) {
 }
 
 // ReadComplex reads Matrix Market inputs for complex type from an io.Reader
-func ReadComplex(r io.Reader) (CMatrix, error) {
+func ReadComplex(r io.Reader) (CMM, error) {
 
-	var matrix CMatrix
+	var matrix CMM
 
 	scanner := makeScanner(r)
 

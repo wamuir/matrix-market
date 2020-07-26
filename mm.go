@@ -68,30 +68,32 @@ var supported = []mmType{
 	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetrySymm},
 }
 
-type mmType struct {
-	Object   string
-	Format   string
-	Field    string
-	Symmetry string
-}
-
 type index struct {
 	M int
 	N int
 	L int
 }
 
-// CMatrix is a basic matrix interface type for complex matrices.
-type CMatrix interface {
+// MM is a basic matrix interface type for real valued Matrix Market matrices.
+type MM interface {
+	// mat.Matrix
+	scanElement(int, string) error
+	ToDense() mat.Matrix
+	ToSparse() *sparse.DOK
+}
+
+// CMM is a basic matrix interface type for complex valued Matrix Market matrices.
+type CMM interface {
+	// mat.CMatrix
 	scanElement(int, string) error
 	ToDense() mat.CMatrix
 }
 
-// Matrix is a basic matrix interface type for matrices.
-type Matrix interface {
-	scanElement(int, string) error
-	ToDense() mat.Matrix
-	ToSparse() *sparse.DOK
+type mmType struct {
+	Object   string
+	Format   string
+	Field    string
+	Symmetry string
 }
 
 func (t *mmType) isMatrix() bool     { return t.Object == mtxObjectMatrix }
