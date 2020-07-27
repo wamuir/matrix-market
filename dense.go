@@ -46,23 +46,26 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 	if n, err := w.Write(t.Bytes()); err == nil {
 		total += n
 	} else {
-		return total, err
+		return total, ErrUnwritable
 	}
 
 	M, N := m.Matrix.Dims()
 	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
 		total += n
 	} else {
-		return total, err
+		return total, ErrUnwritable
 	}
 
 	for i := 0; i < M; i++ {
+
 		for j := 0; j < N; j++ {
-			if n, err := fmt.Fprintf(w, "%f\n", m.Matrix.At(i, j)); err == nil {
-				total += n
-			} else {
-				panic(err)
+
+			n, err := fmt.Fprintf(w, "%f\n", m.Matrix.At(i, j))
+			if err != nil {
+				return total, ErrUnwritable
 			}
+
+			total += n
 		}
 
 	}

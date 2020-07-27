@@ -47,25 +47,33 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 	if n, err := w.Write(t.Bytes()); err == nil {
 		total += n
 	} else {
-		return total, err
+		return total, ErrUnwritable
 	}
 
 	M, N := m.Matrix.Dims()
 	if n, err := fmt.Fprintf(w, "%d %d %d\n", M, N, m.Matrix.NNZ()); err == nil {
 		total += n
 	} else {
-		return total, err
+		return total, ErrUnwritable
 	}
 
+	var err error
 	m.Matrix.DoNonZero(func(i, j int, v float64) {
-		if n, err := fmt.Fprintf(w, "%d %d %f\n", i+1, j+1, v); err == nil {
-			total += n
-		} else {
-			panic(err)
+
+		if err != nil {
+			return
 		}
+
+		n, e := fmt.Fprintf(w, "%d %d %f\n", i+1, j+1, v)
+		if e != nil {
+			err = ErrUnwritable
+			return
+		}
+
+		total += n
 	})
 
-	return total, nil
+	return total, err
 }
 
 // Should the receiver not be a pointer?

@@ -37,7 +37,7 @@ var (
 	ErrNoHeader        = fmt.Errorf("missing matrix market header line")
 	ErrNotMTX          = fmt.Errorf("input is not a matrix market")
 	ErrUnsupportedType = fmt.Errorf("unrecognizable matrix description")
-	ErrUnwritable      = fmt.Errorf("unable to write matrix to file")
+	ErrUnwritable      = fmt.Errorf("unable to write matrix to writer")
 )
 
 var supported = []mmType{

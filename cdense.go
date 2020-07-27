@@ -46,26 +46,28 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 	if n, err := w.Write(t.Bytes()); err == nil {
 		total += n
 	} else {
-		return total, err
+		return total, ErrUnwritable
 	}
 
 	M, N := m.CMatrix.Dims()
 	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
 		total += n
 	} else {
-		return total, err
+		return total, ErrUnwritable
 	}
 
 	for i := 0; i < M; i++ {
+
 		for j := 0; j < N; j++ {
 
 			v := m.CMatrix.At(i, j)
 
-			if n, err := fmt.Fprintf(w, "%f %f\n", real(v), imag(v)); err == nil {
-				total += n
-			} else {
-				panic(err)
+			n, err := fmt.Fprintf(w, "%f %f\n", real(v), imag(v))
+			if err != nil {
+				return total, ErrUnwritable
 			}
+
+			total += n
 		}
 
 	}
