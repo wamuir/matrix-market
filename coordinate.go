@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/james-bowman/sparse"
 	"gonum.org/v1/gonum/mat"
@@ -23,12 +24,48 @@ func (m *MMCOO) ToMatrix() mat.Matrix { return m.Matrix }
 
 func (m *MMCOO) MarshalText() ([]byte, error) {
 
-	return nil, nil
+	var b strings.Builder
+
+	if _, err := m.MarshalTextTo(&b); err != nil {
+		return nil, err
+	}
+
+	return []byte(b.String()), nil
 }
 
 func (m *MMCOO) MarshalTextTo(w io.Writer) (int, error) {
 
-	return 0, nil
+	var total int
+
+	t := mmType{
+		mtxObjectMatrix,
+		mtxFormatCoordinate,
+		mtxFieldReal,
+		mtxSymmetryGeneral,
+	}
+
+	if n, err := w.Write(t.Bytes()); err == nil {
+		total += n
+	} else {
+		return total, err
+	}
+
+	M, N := m.Matrix.Dims()
+	if n, err := fmt.Fprintf(w, "%d %d %d\n", M, N, m.Matrix.NNZ()); err == nil {
+		total += n
+	} else {
+		return total, err
+	}
+
+	m.Matrix.DoNonZero(func(i, j int, v float64) {
+		if n, err := fmt.Fprintf(w, "%d %d %f\n", i+1, j+1, v); err == nil {
+			total += n
+		} else {
+			panic(err)
+		}
+	})
+
+	return total, nil
 }
 
 // Should the receiver not be a pointer?
@@ -45,6 +82,10 @@ func (m *MMCOO) UnmarshalText(text []byte) error {
 
 func (m *MMCOO) UnmarshalTextFrom(r io.Reader) (int, error) {
 
+	var n counter
+
+	r = io.TeeReader(r, &n)
+
 	scanner := bufio.NewScanner(r)
 	buf := make([]byte, maxScanTokenSize)
 	scanner.Buffer(buf, maxScanTokenSize)
@@ -52,22 +93,22 @@ func (m *MMCOO) UnmarshalTextFrom(r io.Reader) (int, error) {
 	// read header
 	t, err := scanHeader(scanner)
 	if err != nil {
-		return 0, err
+		return n.total, err
 	}
 
 	if t.isComplex() {
-		return 0, ErrUnsupportedType
+		return n.total, ErrUnsupportedType
 	}
 
 	if err := m.scanCoordinateData(scanner); err != nil {
-		return 0, err
+		return n.total, err
 	}
 
 	if err := scanner.Err(); err != nil {
-		return 0, err
+		return n.total, err
 	}
 
-	return 0, nil
+	return n.total, nil
 }
 
 func (m *MMCOO) scanCoordinateData(scanner *bufio.Scanner) error {

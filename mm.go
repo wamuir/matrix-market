@@ -128,6 +128,19 @@ func (t *mmType) isMMType(t2 *mmType) bool {
 	return true
 }
 
+func (t *mmType) Bytes() []byte {
+
+	s := fmt.Sprintf(
+		"%s %s %s %s %s\n",
+		matrixMktBanner,
+		t.Object,
+		t.Format,
+		t.Field,
+		t.Symmetry,
+	)
+	return []byte(s)
+}
+
 // isSupported reports if receiver is among supported Matrix Market types,
 // based on comparison against object, format, field and symmetry.
 func (t *mmType) isSupported() bool {
@@ -166,4 +179,16 @@ func scanHeader(scanner *bufio.Scanner) (*mmType, error) {
 	}
 
 	return &t, nil
+}
+
+// counter tallies the number of bytes written to it,
+type counter struct {
+	total int
+}
+
+// Write implements the io.Writer interface.
+func (c *counter) Write(p []byte) (int, error) {
+	var n int = len(p)
+	c.total += n
+	return n, nil
 }
