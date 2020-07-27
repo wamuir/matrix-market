@@ -2,6 +2,7 @@
 
 [![GoDoc Reference](https://godoc.org/github.com/wamuir/matrix-market?status.svg)](http://godoc.org/github.com/wamuir/matrix-market)
 [![Build Status](https://travis-ci.org/wamuir/matrix-market.svg?branch=master)](https://travis-ci.org/wamuir/matrix-market)
+[![codecov](https://codecov.io/gh/wamuir/matrix-market/branch/master/graph/badge.svg)](https://codecov.io/gh/wamuir/matrix-market)
 [![Go Report Card](https://goreportcard.com/badge/github.com/wamuir/matrix-market)](https://goreportcard.com/report/github.com/wamuir/matrix-market)
 
 # Description
