@@ -24,20 +24,22 @@ exchanging matrix data.
 # Usage
 
 ```go
-  file, err := os.Open("matrix.mtx")
+
+  var m market.COO
+
+  file, err := os.Open("sparse.mtx")
   if err != nil {
       log.Fatal(err)
   }
   defer file.Close()
 
-  mtx, err := market.Read(file)
+  _, err := m.UnmarshalTextFrom(file)
   if err != nil {
       log.Fatal(err)
   }
 
-  var dok *sparse.DOK = mtx.ToSparse()  // github.com/james-bowman/sparse
+  var c *sparse.COO = m.ToCOO()  // github.com/james-bowman/sparse
 
-  var arr mat.Matrix = mtx.ToDense()    // gonum.org/v1/gonum/mat
 ```
 
 # See also
