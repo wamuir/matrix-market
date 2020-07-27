@@ -18,6 +18,62 @@ variety of applications, as well as matrix generation tools and services."
 The Matrix Market native exchange format has become a standard for
 exchanging matrix data.
 
+## Sparse Matrices (Coordinate Format)
+
+#### Sparse Real-Valued Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Coordinate | Real    | General        |
+| Matrix | Coordinate | Real    | Skew-Symmetric |
+| Matrix | Coordinate | Real    | Symmetric      |
+
+#### Sparse Integer Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Coordinate | Integer | General        |
+| Matrix | Coordinate | Integer | Skew-Symmetric |
+| Matrix | Coordinate | Integer | Symmetric      |
+
+#### Sparse Complex-Valued Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Coordinate | Complex | General        |
+| Matrix | Coordinate | Complex | Hermitian      |
+| Matrix | Coordinate | Complex | Skew-Symmetric |
+| Matrix | Coordinate | Complex | Symmetric      |
+
+#### Sparse Pattern Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Coordinate | Pattern | General        |
+| Matrix | Coordinate | Pattern | Symmetric      |
+
+
+## Dense Matrices (Array Format)
+
+#### Dense Real-Valued Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Array      | Real    | General        |
+| Matrix | Array      | Real    | Skew-Symmetric |
+| Matrix | Array      | Real    | Symmetric      |
+
+#### Dense Integer Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Array      | Integer | General        |
+| Matrix | Array      | Integer | Skew-Symmetric |
+| Matrix | Array      | Integer | Symmetric      |
+
+#### Dense Complex-Valued Matrices
+| Object | Format     | Field   | Symmetry       |
+| ------ | ---------- | ------- | -------------- |
+| Matrix | Array      | Complex | General        |
+| Matrix | Array      | Complex | Hermitian      |
+| Matrix | Array      | Complex | Skew-Symmetric |
+| Matrix | Array      | Complex | Symmetric      |
+
+
 # Installation
 
   go get -u github.com/wamuir/matrix-market
