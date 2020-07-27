@@ -38,7 +38,7 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 
 	t := mmType{
 		mtxObjectMatrix,
-		mtxFormatCoordinate,
+		mtxFormatArray,
 		mtxFieldReal,
 		mtxSymmetryGeneral,
 	}
