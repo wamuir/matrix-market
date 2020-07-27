@@ -21,57 +21,58 @@ exchanging matrix data.
 ## Sparse Matrices (Coordinate Format)
 
 #### Sparse Real-Valued Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Coordinate | Real    | General        |
-| Matrix | Coordinate | Real    | Skew-Symmetric |
-| Matrix | Coordinate | Real    | Symmetric      |
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Coordinate | Real    | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO) |
+| Matrix | Coordinate | Real    | Skew-Symmetric | Planned   |                                                                           |                                                                    |
+| Matrix | Coordinate | Real    | Symmetric      | Planned   |                                                                           |                                                                    |
 
-#### Sparse Integer Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Coordinate | Integer | General        |
-| Matrix | Coordinate | Integer | Skew-Symmetric |
-| Matrix | Coordinate | Integer | Symmetric      |
+#### Sparse Integer-Valued Matrices
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Coordinate | Integer | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO) |
+| Matrix | Coordinate | Integer | Skew-Symmetric | Planned   |
+| Matrix | Coordinate | Integer | Symmetric      | Planned   |
 
 #### Sparse Complex-Valued Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Coordinate | Complex | General        |
-| Matrix | Coordinate | Complex | Hermitian      |
-| Matrix | Coordinate | Complex | Skew-Symmetric |
-| Matrix | Coordinate | Complex | Symmetric      |
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Coordinate | Complex | General        | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [[mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)     |
+| Matrix | Coordinate | Complex | Hermitian      | Planned   |                                                                           |                                                                    |
+| Matrix | Coordinate | Complex | Skew-Symmetric | Planned   |                                                                           |                                                                    |
+| Matrix | Coordinate | Complex | Symmetric      | Planned   |                                                                           |                                                                    |
 
 #### Sparse Pattern Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Coordinate | Pattern | General        |
-| Matrix | Coordinate | Pattern | Symmetric      |
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Coordinate | Pattern | General        | Planned   |                                                                           |                                                                    |
+| Matrix | Coordinate | Pattern | Symmetric      | Planned   |                                                                           |                                                                    |
 
 
 ## Dense Matrices (Array Format)
 
 #### Dense Real-Valued Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Array      | Real    | General        |
-| Matrix | Array      | Real    | Skew-Symmetric |
-| Matrix | Array      | Real    | Symmetric      |
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Array      | Real    | General        | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)        |
+| Matrix | Array      | Real    | Skew-Symmetric | Planned   |                                                                           |                                                                    |
+| Matrix | Array      | Real    | Symmetric      | Planned   |                                                                           |                                                                    |
 
-#### Dense Integer Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Array      | Integer | General        |
-| Matrix | Array      | Integer | Skew-Symmetric |
-| Matrix | Array      | Integer | Symmetric      |
+#### Dense Integer-Valued Matrices
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Array      | Real    | General        | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)        |
+| Matrix | Array      | Integer | Skew-Symmetric | Planned   |                                                                           |                                                                    |
+| Matrix | Array      | Integer | Symmetric      | Planned   |                                                                           |                                                                    |
 
 #### Dense Complex-Valued Matrices
-| Object | Format     | Field   | Symmetry       |
-| ------ | ---------- | ------- | -------------- |
-| Matrix | Array      | Complex | General        |
-| Matrix | Array      | Complex | Hermitian      |
-| Matrix | Array      | Complex | Skew-Symmetric |
-| Matrix | Array      | Complex | Symmetric      |
+| Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
+| ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
+| Matrix | Array      | Complex | General        | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)      |
+| Matrix | Array      | Complex | Hermitian      | Planned   |                                                                           |                                                                    |
+| Matrix | Array      | Complex | Skew-Symmetric | Planned   |                                                                           |                                                                    |
+| Matrix | Array      | Complex | Symmetric      | Planned   |                                                                           |                                                                    |
+
 
 
 # Installation
