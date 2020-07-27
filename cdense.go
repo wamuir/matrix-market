@@ -58,7 +58,10 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 
 	for i := 0; i < M; i++ {
 		for j := 0; j < N; j++ {
-			if n, err := fmt.Fprintf(w, "%f\n", m.CMatrix.At(i, j)); err == nil {
+
+			v := m.CMatrix.At(i, j)
+
+			if n, err := fmt.Fprintf(w, "%f %f\n", real(v), imag(v)); err == nil {
 				total += n
 			} else {
 				panic(err)
