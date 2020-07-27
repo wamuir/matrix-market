@@ -7,22 +7,21 @@ import (
 	"io"
 	"strings"
 
-	"github.com/james-bowman/sparse"
 	"gonum.org/v1/gonum/mat"
 )
 
-// COO is a type embedding of sparse.COO
-type COO struct{ Matrix *sparse.COO }
+// Dense is a type embedding of sparse.COO
+type Dense struct{ Matrix *mat.Dense }
 
-// NewCOO creates a new COO from a sparse.COO
-func NewCOO(c *sparse.COO) *COO { return &COO{c} }
+// NewDense creates a new MMCOO from a sparse.COO
+func NewDense(d *mat.Dense) *Dense { return &Dense{d} }
 
-// ToCOO shares data with the receiver
-func (m *COO) ToCOO() *sparse.COO { return m.Matrix }
+// ToDense shares data with the receiver
+func (m *Dense) ToDense() *mat.Dense { return m.Matrix }
 
-func (m *COO) ToMatrix() mat.Matrix { return m.Matrix }
+func (m *Dense) ToMatrix() mat.Matrix { return m.Matrix }
 
-func (m *COO) MarshalText() ([]byte, error) {
+func (m *Dense) MarshalText() ([]byte, error) {
 
 	var b strings.Builder
 
@@ -33,7 +32,7 @@ func (m *COO) MarshalText() ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
-func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
+func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
 
@@ -51,25 +50,28 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 	}
 
 	M, N := m.Matrix.Dims()
-	if n, err := fmt.Fprintf(w, "%d %d %d\n", M, N, m.Matrix.NNZ()); err == nil {
+	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
 		total += n
 	} else {
 		return total, err
 	}
 
-	m.Matrix.DoNonZero(func(i, j int, v float64) {
-		if n, err := fmt.Fprintf(w, "%d %d %f\n", i+1, j+1, v); err == nil {
-			total += n
-		} else {
-			panic(err)
+	for i := 0; i < M; i++ {
+		for j := 0; j < N; j++ {
+			if n, err := fmt.Fprintf(w, "%f\n", m.Matrix.At(i, j)); err == nil {
+				total += n
+			} else {
+				panic(err)
+			}
 		}
-	})
+
+	}
 
 	return total, nil
 }
 
 // Should the receiver not be a pointer?
-func (m *COO) UnmarshalText(text []byte) error {
+func (m *Dense) UnmarshalText(text []byte) error {
 
 	r := bytes.NewReader(text)
 
@@ -80,7 +82,7 @@ func (m *COO) UnmarshalText(text []byte) error {
 	return nil
 }
 
-func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
+func (m *Dense) UnmarshalTextFrom(r io.Reader) (int, error) {
 
 	var n counter
 
@@ -100,7 +102,7 @@ func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
 		return n.total, ErrUnsupportedType
 	}
 
-	if err := m.scanCoordinateData(scanner); err != nil {
+	if err := m.scanArrayData(scanner); err != nil {
 		return n.total, err
 	}
 
@@ -111,7 +113,7 @@ func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
 	return n.total, nil
 }
 
-func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
+func (m *Dense) scanArrayData(scanner *bufio.Scanner) error {
 
 	var M, N, L, k int
 
@@ -124,23 +126,21 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 			continue
 		}
 
-		_, err := fmt.Sscanf(line, "%d %d %d", &M, &N, &L)
+		_, err := fmt.Sscanf(line, "%d %d", &M, &N)
 		if err != nil {
 			return ErrInputScanError
 		}
 
-		break
+		L = M * N
 
+		break
 	}
 
-	c := sparse.NewCOO(M, N, make([]int, L), make([]int, L), make([]float64, L))
+	d := mat.NewDense(M, N, nil)
 
 	for scanner.Scan() {
 
-		var (
-			i, j int
-			v    float64
-		)
+		var v float64
 
 		line := scanner.Text()
 
@@ -155,12 +155,12 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 			return ErrInputScanError
 		}
 
-		_, err := fmt.Sscanf(line, "%d %d %f", &i, &j, &v)
+		_, err := fmt.Sscanf(line, "%f", &v)
 		if err != nil {
-			return err
+			return ErrInputScanError
 		}
 
-		c.Set(i-1, j-1, v)
+		d.Set(int(k/N), k%N, v)
 
 		k++
 	}
@@ -175,7 +175,7 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 		return ErrInputScanError
 	}
 
-	m.Matrix = c
+	m.Matrix = d
 
 	return nil
 }

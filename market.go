@@ -4,9 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"strings"
-
-	"github.com/james-bowman/sparse"
-	"gonum.org/v1/gonum/mat"
 )
 
 const maxScanTokenSize = 64 * 1024
@@ -72,21 +69,6 @@ type index struct {
 	M int
 	N int
 	L int
-}
-
-// MM is a basic matrix interface type for real valued Matrix Market matrices.
-type MM interface {
-	// mat.Matrix
-	scanElement(int, string) error
-	ToDense() mat.Matrix
-	ToSparse() *sparse.DOK
-}
-
-// CMM is a basic matrix interface type for complex valued Matrix Market matrices.
-type CMM interface {
-	// mat.CMatrix
-	scanElement(int, string) error
-	ToDense() mat.CMatrix
 }
 
 type mmType struct {
