@@ -18,6 +18,33 @@ variety of applications, as well as matrix generation tools and services."
 The Matrix Market native exchange format has become a standard for
 exchanging matrix data.
 
+# Installation
+
+  go get -u github.com/wamuir/matrix-market
+
+# Usage
+
+```go
+
+  var m market.COO
+
+  file, err := os.Open("sparse.mtx")
+  if err != nil {
+      log.Fatal(err)
+  }
+  defer file.Close()
+
+  _, err := m.UnmarshalTextFrom(file)
+  if err != nil {
+      log.Fatal(err)
+  }
+
+  var c *sparse.COO = m.ToCOO()  // github.com/james-bowman/sparse
+
+```
+
+# Supported Formats
+
 ## Sparse Matrices (Coordinate Format)
 
 #### Sparse Real-Valued Matrices
@@ -37,7 +64,7 @@ exchanging matrix data.
 #### Sparse Complex-Valued Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                            |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------: |
-| Matrix | Coordinate | Complex | General        | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [[mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)     |
+| Matrix | Coordinate | Complex | General        | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)      |
 | Matrix | Coordinate | Complex | Hermitian      | Planned   |                                                                           |                                                                    |
 | Matrix | Coordinate | Complex | Skew-Symmetric | Planned   |                                                                           |                                                                    |
 | Matrix | Coordinate | Complex | Symmetric      | Planned   |                                                                           |                                                                    |
@@ -75,30 +102,6 @@ exchanging matrix data.
 
 
 
-# Installation
-
-  go get -u github.com/wamuir/matrix-market
-
-# Usage
-
-```go
-
-  var m market.COO
-
-  file, err := os.Open("sparse.mtx")
-  if err != nil {
-      log.Fatal(err)
-  }
-  defer file.Close()
-
-  _, err := m.UnmarshalTextFrom(file)
-  if err != nil {
-      log.Fatal(err)
-  }
-
-  var c *sparse.COO = m.ToCOO()  // github.com/james-bowman/sparse
-
-```
 
 # See also
 
