@@ -103,7 +103,7 @@ func (m *CDense) UnmarshalTextFrom(r io.Reader) (int, error) {
 		return n.total, err
 	}
 
-	if t.isComplex() {
+	if !(t.isComplex()) {
 		return n.total, ErrUnsupportedType
 	}
 
