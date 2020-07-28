@@ -72,7 +72,7 @@ exchanging matrix data.
 #### Sparse Pattern Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
-| Matrix | Coordinate | Integer | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
+| Matrix | Coordinate | Pattern | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
 | Matrix | Coordinate | Pattern | Symmetric      | Planned   |                                                                           |                                                                          |
 
 
@@ -88,7 +88,7 @@ exchanging matrix data.
 #### Dense Integer-Valued Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
-| Matrix | Array      | Real    | General        | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
+| Matrix | Array      | Integer | General        | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
 | Matrix | Array      | Integer | Skew-Symmetric | Planned   |                                                                           |                                                                          |
 | Matrix | Array      | Integer | Symmetric      | Planned   |                                                                           |                                                                          |
 
