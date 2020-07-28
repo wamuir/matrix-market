@@ -12,6 +12,26 @@ func sts(s string) *bufio.Scanner {
 	return bufio.NewScanner(r)
 }
 
+func TestMMTypeIsMMType(t *testing.T) {
+
+	for i := range supported {
+		for j := range supported {
+			if i == j {
+				continue
+			}
+			if supported[i].isMMType(&supported[j]) != (i == j) {
+				t.Errorf(
+					"Expected equality of types to evaluate %v, received: %v",
+					(i == j),
+					!(i == j),
+				)
+			}
+
+		}
+	}
+
+}
+
 func TestScanHeader(t *testing.T) {
 
 	// valid header
