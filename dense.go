@@ -101,7 +101,7 @@ func (m *Dense) UnmarshalTextFrom(r io.Reader) (int, error) {
 		return n.total, err
 	}
 
-	if !(t.isArray() && t.isReal() && t.isGeneral()) {
+	if !(t.isMatrix() && t.isArray() && (t.isReal() || t.isInteger()) && t.isGeneral()) {
 		return n.total, ErrUnsupportedType
 	}
 
