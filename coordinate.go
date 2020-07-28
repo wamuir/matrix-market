@@ -104,7 +104,7 @@ func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
 		return n.total, err
 	}
 
-	if t.isComplex() {
+	if !(t.isCoordinate() && t.isReal() && t.isGeneral()) {
 		return n.total, ErrUnsupportedType
 	}
 
