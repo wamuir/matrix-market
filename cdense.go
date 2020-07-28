@@ -11,15 +11,29 @@ import (
 )
 
 // CDense is a type embedding of sparse.COO
-type CDense struct{ CMatrix *mat.CDense }
+type CDense struct {
+	Object   string
+	Format   string
+	Field    string
+	Symmetry string
+	mat      *mat.CDense
+}
 
 // NewCDense creates a new MMCOO from a sparse.COO
-func NewCDense(d *mat.CDense) *CDense { return &CDense{d} }
+func NewCDense(d *mat.CDense) *CDense {
+	return &CDense{
+		Object:   mtxObjectMatrix,
+		Format:   mtxFormatArray,
+		Field:    mtxFieldComplex,
+		Symmetry: mtxSymmetryGeneral,
+		mat:      d,
+	}
+}
 
 // ToCDense shares data with the receiver
-func (m *CDense) ToCDense() *mat.CDense { return m.CMatrix }
+func (m *CDense) ToCDense() *mat.CDense { return m.mat }
 
-func (m *CDense) ToCMatrix() mat.CMatrix { return m.CMatrix }
+func (m *CDense) ToCMatrix() mat.CMatrix { return m.mat }
 
 func (m *CDense) MarshalText() ([]byte, error) {
 
@@ -36,12 +50,7 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
 
-	t := mmType{
-		mtxObjectMatrix,
-		mtxFormatArray,
-		mtxFieldComplex,
-		mtxSymmetryGeneral,
-	}
+	t := mmType{m.Object, m.Format, m.Field, m.Symmetry}
 
 	if n, err := w.Write(t.Bytes()); err == nil {
 		total += n
@@ -49,7 +58,7 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 		return total, ErrUnwritable
 	}
 
-	M, N := m.CMatrix.Dims()
+	M, N := m.mat.Dims()
 	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
 		total += n
 	} else {
@@ -60,7 +69,7 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 
 		for j := 0; j < N; j++ {
 
-			v := m.CMatrix.At(i, j)
+			v := m.mat.At(i, j)
 
 			n, err := fmt.Fprintf(w, "%f %f\n", real(v), imag(v))
 			if err != nil {
@@ -180,7 +189,7 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 		return ErrInputScanError
 	}
 
-	m.CMatrix = d
+	m.mat = d
 
 	return nil
 }

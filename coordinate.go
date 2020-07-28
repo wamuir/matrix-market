@@ -12,15 +12,29 @@ import (
 )
 
 // COO is a type embedding of sparse.COO
-type COO struct{ Matrix *sparse.COO }
+type COO struct {
+	Object   string
+	Format   string
+	Field    string
+	Symmetry string
+	mat      *sparse.COO
+}
 
 // NewCOO creates a new COO from a sparse.COO
-func NewCOO(c *sparse.COO) *COO { return &COO{c} }
+func NewCOO(c *sparse.COO) *COO {
+	return &COO{
+		Object:   mtxObjectMatrix,
+		Format:   mtxFormatCoordinate,
+		Field:    mtxFieldReal,
+		Symmetry: mtxSymmetryGeneral,
+		mat:      c,
+	}
+}
 
 // ToCOO shares data with the receiver
-func (m *COO) ToCOO() *sparse.COO { return m.Matrix }
+func (m *COO) ToCOO() *sparse.COO { return m.mat }
 
-func (m *COO) ToMatrix() mat.Matrix { return m.Matrix }
+func (m *COO) ToMatrix() mat.Matrix { return m.mat }
 
 func (m *COO) MarshalText() ([]byte, error) {
 
@@ -37,11 +51,11 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
 
-	t := mmType{
-		mtxObjectMatrix,
-		mtxFormatCoordinate,
-		mtxFieldReal,
-		mtxSymmetryGeneral,
+	t := mmType{m.Object, m.Format, m.Field, m.Symmetry}
+
+	// Need additional checks on mmType
+	if !(t.isMatrix() && t.isCoordinate()) {
+		return total, ErrUnsupportedType
 	}
 
 	if n, err := w.Write(t.Bytes()); err == nil {
@@ -50,15 +64,15 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 		return total, ErrUnwritable
 	}
 
-	M, N := m.Matrix.Dims()
-	if n, err := fmt.Fprintf(w, "%d %d %d\n", M, N, m.Matrix.NNZ()); err == nil {
+	M, N := m.mat.Dims()
+	if n, err := fmt.Fprintf(w, "%d %d %d\n", M, N, m.mat.NNZ()); err == nil {
 		total += n
 	} else {
 		return total, ErrUnwritable
 	}
 
 	var err error
-	m.Matrix.DoNonZero(func(i, j int, v float64) {
+	m.mat.DoNonZero(func(i, j int, v float64) {
 
 		if err != nil {
 			return
@@ -183,7 +197,7 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 		return ErrInputScanError
 	}
 
-	m.Matrix = c
+	m.mat = c
 
 	return nil
 }

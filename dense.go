@@ -11,15 +11,29 @@ import (
 )
 
 // Dense is a type embedding of sparse.COO
-type Dense struct{ Matrix *mat.Dense }
+type Dense struct {
+	Object   string
+	Format   string
+	Field    string
+	Symmetry string
+	mat      *mat.Dense
+}
 
 // NewDense creates a new MMCOO from a sparse.COO
-func NewDense(d *mat.Dense) *Dense { return &Dense{d} }
+func NewDense(d *mat.Dense) *Dense {
+	return &Dense{
+		Object:   mtxObjectMatrix,
+		Format:   mtxFormatArray,
+		Field:    mtxFieldReal,
+		Symmetry: mtxSymmetryGeneral,
+		mat:      d,
+	}
+}
 
 // ToDense shares data with the receiver
-func (m *Dense) ToDense() *mat.Dense { return m.Matrix }
+func (m *Dense) ToDense() *mat.Dense { return m.mat }
 
-func (m *Dense) ToMatrix() mat.Matrix { return m.Matrix }
+func (m *Dense) ToMatrix() mat.Matrix { return m.mat }
 
 func (m *Dense) MarshalText() ([]byte, error) {
 
@@ -36,12 +50,7 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
 
-	t := mmType{
-		mtxObjectMatrix,
-		mtxFormatArray,
-		mtxFieldReal,
-		mtxSymmetryGeneral,
-	}
+	t := mmType{m.Object, m.Format, m.Field, m.Symmetry}
 
 	if n, err := w.Write(t.Bytes()); err == nil {
 		total += n
@@ -49,7 +58,7 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 		return total, ErrUnwritable
 	}
 
-	M, N := m.Matrix.Dims()
+	M, N := m.mat.Dims()
 	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
 		total += n
 	} else {
@@ -60,7 +69,7 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 
 		for j := 0; j < N; j++ {
 
-			n, err := fmt.Fprintf(w, "%f\n", m.Matrix.At(i, j))
+			n, err := fmt.Fprintf(w, "%f\n", m.mat.At(i, j))
 			if err != nil {
 				return total, ErrUnwritable
 			}
@@ -178,7 +187,7 @@ func (m *Dense) scanArrayData(scanner *bufio.Scanner) error {
 		return ErrInputScanError
 	}
 
-	m.Matrix = d
+	m.mat = d
 
 	return nil
 }
