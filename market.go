@@ -65,12 +65,6 @@ var supported = []mmType{
 	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetrySymm},
 }
 
-type index struct {
-	M int
-	N int
-	L int
-}
-
 type mmType struct {
 	Object   string
 	Format   string
