@@ -86,7 +86,7 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 			return
 		}
 
-		n, e := fmt.Fprintf(w, "%d %d %f\n", i+1, j+1, v)
+		n, e := fmt.Fprintf(w, "%d %d %g\n", i+1, j+1, v)
 		if e != nil {
 			err = ErrUnwritable
 			return
