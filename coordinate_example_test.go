@@ -15,7 +15,7 @@ func ExampleCOO_MarshalText() {
 	mtx.Set(1, 1, 0.897566664045815500)
 	mtx.Set(2, 2, 0.402696290353813800)
 
-	// m is a COO matrix initalized with mtx
+	// m is a COO matrix initialized with mtx
 	m := NewCOO(mtx)
 
 	// serialized m into []byte (mm)

@@ -16,7 +16,7 @@ func ExampleCDense_MarshalText() {
 		complex(+0.402696290353813800, +0.009438983689089353),
 	})
 
-	// m is a CDense matrix initalized with mtx
+	// m is a CDense matrix initialized with mtx
 	m := NewCDense(mtx)
 
 	// serialize m into []byte (mm)
@@ -50,7 +50,7 @@ func ExampleCDense_UnmarshalText() {
 	// mtx is a dense matrix representation with complex data
 	mtx := mat.NewCDense(2, 2, nil)
 
-	// m is a CDense matrix initalized with mtx
+	// m is a CDense matrix initialized with mtx
 	m := NewCDense(mtx)
 
 	// deserialize mm into m

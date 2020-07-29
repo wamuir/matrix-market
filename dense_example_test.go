@@ -20,7 +20,7 @@ func ExampleDense_MarshalText() {
 		+0.009438983689089353,
 	})
 
-	// m is a Dense matrix initalized with mtx
+	// m is a Dense matrix initialized with mtx
 	m := NewDense(mtx)
 
 	// serialize m into []byte (mm)
@@ -62,7 +62,7 @@ func ExampleDense_UnmarshalText() {
 	// mtx is a dense matrix representation
 	mtx := mat.NewDense(4, 2, nil)
 
-	// m is a Dense matrix initalized with mtx
+	// m is a Dense matrix initialized with mtx
 	m := NewDense(mtx)
 
 	// deserialize mm into m
