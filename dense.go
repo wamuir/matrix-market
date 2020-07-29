@@ -78,7 +78,7 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 
 		for j := 0; j < N; j++ {
 
-			n, err := fmt.Fprintf(w, "%f\n", m.mat.At(i, j))
+			n, err := fmt.Fprintf(w, "%g\n", m.mat.At(i, j))
 			if err != nil {
 				return total, ErrUnwritable
 			}
@@ -179,7 +179,7 @@ func (m *Dense) scanArrayData(scanner *bufio.Scanner) error {
 			return ErrInputScanError
 		}
 
-		_, err := fmt.Sscanf(line, "%f", &v)
+		_, err := fmt.Sscanf(line, "%g", &v)
 		if err != nil {
 			return ErrInputScanError
 		}

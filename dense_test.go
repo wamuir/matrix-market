@@ -27,7 +27,7 @@ func TestNewDense(t *testing.T) {
 	}
 }
 
-func TestDenseMarshalText(t *testing.T) {
+func TestDenseMarshalTextTo(t *testing.T) {
 
 	var b strings.Builder
 
@@ -63,7 +63,7 @@ func TestDenseMarshalText(t *testing.T) {
 
 }
 
-func TestDenseMarshalTextTo(t *testing.T) {
+func TestDenseMarshalText(t *testing.T) {
 
 	mtx := mat.NewDense(
 		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
