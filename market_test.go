@@ -14,14 +14,25 @@ func sts(s string) *bufio.Scanner {
 
 func TestScanHeader(t *testing.T) {
 
-	// example valid coordinate header
-	if _, err := scanHeader(sts(`%%MatrixMarket matrix coordinate integer general`)); err != nil {
+	// example valid coordinate-integer header
+	if h, err := scanHeader(sts(`%%MatrixMarket matrix coordinate integer skew-symmetric`)); err != nil {
 		t.Errorf(err.Error())
+	} else if !(h.isSparse() && h.isInteger() && h.isSkew()) {
+		t.Errorf("Header elements failed to evaluate")
 	}
 
-	// example valid array header
-	if _, err := scanHeader(sts(`%%MatrixMarket matrix array complex hermitian`)); err != nil {
+	// example valid coordinate-pattern header
+	if h, err := scanHeader(sts(`%%MatrixMarket matrix coordinate pattern symmetric`)); err != nil {
 		t.Errorf(err.Error())
+	} else if !(h.isSparse() && h.isPattern() && h.isSymmetric()) {
+		t.Errorf("Header elements failed to evaluate")
+	}
+
+	// example valid array-complex header
+	if h, err := scanHeader(sts(`%%MatrixMarket matrix array complex hermitian`)); err != nil {
+		t.Errorf(err.Error())
+	} else if !(h.isDense() && h.isComplex() && h.isHermitian()) {
+		t.Errorf("Header elements failed to evaluate")
 	}
 
 	// empty header
