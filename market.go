@@ -104,6 +104,7 @@ func (t *mmType) isMMType(t2 *mmType) bool {
 	return true
 }
 
+// Bytes returns a formatted Matrix Market headers
 func (t *mmType) Bytes() []byte {
 
 	s := fmt.Sprintf(
@@ -130,6 +131,8 @@ func (t *mmType) isSupported() bool {
 	return false
 }
 
+// scanHeader scans one line from a scanner and attempts to parse as a
+// Matrix Market header
 func scanHeader(scanner *bufio.Scanner) (*mmType, error) {
 
 	var (
@@ -157,7 +160,7 @@ func scanHeader(scanner *bufio.Scanner) (*mmType, error) {
 	return &t, nil
 }
 
-// counter tallies the number of bytes written to it,
+// counter tallies the number of bytes written to it
 type counter struct {
 	total int
 }

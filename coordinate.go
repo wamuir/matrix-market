@@ -11,7 +11,8 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// COO is a type embedding of sparse.COO
+// COO is a type embedding of sparse.COO, for reading and writing
+// real-valued matrices in Matrix Market coordinate format.
 type COO struct {
 	Object   string
 	Format   string
@@ -20,7 +21,7 @@ type COO struct {
 	mat      *sparse.COO
 }
 
-// NewCOO creates a new COO from a sparse.COO
+// NewCOO initializes a new COO sparse matrix from a sparse.COO matrix
 func NewCOO(c *sparse.COO) *COO {
 	return &COO{
 		Object:   mtxObjectMatrix,
@@ -31,11 +32,16 @@ func NewCOO(c *sparse.COO) *COO {
 	}
 }
 
-// ToCOO shares data with the receiver
+// ToCOO returns a sparse.COO matrix that shared underlying storage
+// with the receiver.
 func (m *COO) ToCOO() *sparse.COO { return m.mat }
 
+// ToMatrix returns a mat.Matrix real matrix that shared underlying
+// storage with the receiver.
 func (m *COO) ToMatrix() mat.Matrix { return m.mat }
 
+// MarshalText serializes the receiver to []byte in Matrix Market
+// format and returns the result.
 func (m *COO) MarshalText() ([]byte, error) {
 
 	var b strings.Builder
@@ -47,6 +53,8 @@ func (m *COO) MarshalText() ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
+// MarshalTextTo serializes the receiver to w in Matrix Market format
+// and returns the result.
 func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
@@ -90,7 +98,8 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 	return total, err
 }
 
-// Should the receiver not be a pointer?
+// UnmarshalText deserializes []byte from Matrix Market format into
+// the receiver.
 func (m *COO) UnmarshalText(text []byte) error {
 
 	r := bytes.NewReader(text)
@@ -102,6 +111,8 @@ func (m *COO) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// UnmarshalTextFrom deserializes r from Matrix Market format into the
+// receiver.
 func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
 
 	var n counter

@@ -10,7 +10,8 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// Dense is a type embedding of sparse.COO
+// Dense is a type embedding of mat.Dense, for reading and writing
+// complex-valued matrices in Matrix Market array format.
 type Dense struct {
 	Object   string
 	Format   string
@@ -19,7 +20,8 @@ type Dense struct {
 	mat      *mat.Dense
 }
 
-// NewDense creates a new MMCOO from a sparse.COO
+// NewDense initializes a new CDense dense matrix from a mat.Dense
+// matrix.
 func NewDense(d *mat.Dense) *Dense {
 	return &Dense{
 		Object:   mtxObjectMatrix,
@@ -30,11 +32,16 @@ func NewDense(d *mat.Dense) *Dense {
 	}
 }
 
-// ToDense shares data with the receiver
+// ToDense returns a mat.Dense matrix that shares underlying storage
+// with the receiver.
 func (m *Dense) ToDense() *mat.Dense { return m.mat }
 
+// ToMatrix returns a mat.Matrix complex matrix that shares underlying
+// storage with the receiver.
 func (m *Dense) ToMatrix() mat.Matrix { return m.mat }
 
+// MarshalText serializes the receiver to []byte in Matrix Market format
+// and returns the result.
 func (m *Dense) MarshalText() ([]byte, error) {
 
 	var b strings.Builder
@@ -46,6 +53,8 @@ func (m *Dense) MarshalText() ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
+// MarshalTextTo serializes the receiver to w in Matrix Market format
+// and returns the result.
 func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
@@ -82,7 +91,8 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 	return total, nil
 }
 
-// Should the receiver not be a pointer?
+// UnmarshalText deserializes []byte from Matrix Market format
+// into the receiver.
 func (m *Dense) UnmarshalText(text []byte) error {
 
 	r := bytes.NewReader(text)
@@ -94,6 +104,8 @@ func (m *Dense) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// UnmarshalTextFrom deserializes r from Matrix Market format
+// into the receiver.
 func (m *Dense) UnmarshalTextFrom(r io.Reader) (int, error) {
 
 	var n counter

@@ -10,7 +10,8 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// CDense is a type embedding of sparse.COO
+// CDense is a type embedding of mat.CDense, for reading and writing
+// complex-valued matrices in Matrix Market array format.
 type CDense struct {
 	Object   string
 	Format   string
@@ -19,7 +20,8 @@ type CDense struct {
 	mat      *mat.CDense
 }
 
-// NewCDense creates a new MMCOO from a sparse.COO
+// NewCDense initializes a new CDense dense matrix from a mat.CDense
+// matrix.
 func NewCDense(d *mat.CDense) *CDense {
 	return &CDense{
 		Object:   mtxObjectMatrix,
@@ -30,11 +32,16 @@ func NewCDense(d *mat.CDense) *CDense {
 	}
 }
 
-// ToCDense shares data with the receiver
+// ToCDense returns a mat.CDense matrix that shares underlying storage
+// with the receiver.
 func (m *CDense) ToCDense() *mat.CDense { return m.mat }
 
+// ToCMatrix returns a mat.CMatrix complex matrix that shares underlying
+// storage with the receiver.
 func (m *CDense) ToCMatrix() mat.CMatrix { return m.mat }
 
+// MarshalText serializes the receiver to []byte in Matrix Market format
+// and returns the result.
 func (m *CDense) MarshalText() ([]byte, error) {
 
 	var b strings.Builder
@@ -46,6 +53,8 @@ func (m *CDense) MarshalText() ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
+// MarshalTextTo serializes the receiver to w in Matrix Market format
+// and returns the result.
 func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 
 	var total int
@@ -71,7 +80,7 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 
 			v := m.mat.At(i, j)
 
-			n, err := fmt.Fprintf(w, "%f %f\n", real(v), imag(v))
+			n, err := fmt.Fprintf(w, "%g %g\n", real(v), imag(v))
 			if err != nil {
 				return total, ErrUnwritable
 			}
@@ -84,7 +93,8 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 	return total, nil
 }
 
-// Should the receiver not be a pointer?
+// UnmarshalText deserializes []byte from Matrix Market format
+// into the receiver.
 func (m *CDense) UnmarshalText(text []byte) error {
 
 	r := bytes.NewReader(text)
@@ -96,6 +106,8 @@ func (m *CDense) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// UnmarshalTextFrom deserializes r from Matrix Market format
+// into the receiver.
 func (m *CDense) UnmarshalTextFrom(r io.Reader) (int, error) {
 
 	var n counter
