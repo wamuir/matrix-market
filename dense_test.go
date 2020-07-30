@@ -1,14 +1,17 @@
 package market
 
 import (
-	"bytes"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gonum.org/v1/gonum/mat"
 )
 
-var dense = mat.NewDense(4, 5, []float64{
+var mtx10 = mat.NewDense(4, 5, []float64{
 	+0.944853346337906500,
 	-0.681501551465435000,
 	-0.000000000000000000,
@@ -33,234 +36,66 @@ var dense = mat.NewDense(4, 5, []float64{
 
 func TestNewDense(t *testing.T) {
 
-	mtx1 := mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
+	m := NewDense(mtx10)
 
-	m := NewDense(mtx1)
-	mtx2 := m.ToMatrix()
-
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\n \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
+	assert.True(t, mat.Equal(m.ToMatrix(), mtx10))
 }
 
 func TestDenseMarshalTextTo(t *testing.T) {
 
 	var b strings.Builder
 
-	mtx := mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
+	m := NewDense(mtx10)
 
-	m1 := NewDense(mtx)
+	_, err := m.MarshalTextTo(&b)
+	assert.Nil(t, err)
 
-	_, err := m1.MarshalTextTo(&b)
-	if err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	mm, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-10.mtx"))
+	assert.Nil(t, err)
 
-	r := strings.NewReader(b.String())
-
-	m2 := NewDense(mat.NewDense(4, 5, nil))
-
-	if _, err := m2.UnmarshalTextFrom(r); err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
-
-	if !(mat.Equal(m1.ToMatrix(), m2.ToMatrix())) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(m1.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(m2.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
-
+	assert.Equal(t, b.String(), string(mm))
 }
 
 func TestDenseMarshalText(t *testing.T) {
 
-	mtx := mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
+	m := NewDense(mtx10)
 
-	m1 := NewDense(mtx)
+	mm1, err := m.MarshalText()
+	assert.Nil(t, err)
 
-	out, err := m1.MarshalText()
-	if err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	mm2, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-10.mtx"))
+	assert.Nil(t, err)
 
-	m2 := NewDense(mat.NewDense(4, 5, nil))
-
-	if err := m2.UnmarshalText(out); err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
-
-	if !(mat.Equal(m1.ToMatrix(), m2.ToMatrix())) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(m1.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(m2.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
-
+	assert.Equal(t, string(mm1), string(mm2))
 }
 
 func TestDenseUnmarshalText(t *testing.T) {
 
-	var (
-		in         []byte
-		mtx1, mtx2 mat.Matrix
-	)
+	M, N := mtx10.Dims()
 
-	// just a good matrix
-	in = []byte(`%%MatrixMarket matrix array real general
-              4 5
-	      0
-	      0
-	      1
-	      0
-	      0
-	      1
-	      0
-	      0
-	      0
-	      0
-	      0
-	      1
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0`)
+	mtx := mat.NewDense(M, N, nil)
+	mm := NewDense(mtx)
 
-	m := NewDense(mat.NewDense(4, 5, nil))
+	b, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-10.mtx"))
+	assert.Nil(t, err)
 
-	if err := m.UnmarshalText(in); err == nil {
-		mtx1 = m.ToMatrix()
-	} else {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	assert.Nil(t, mm.UnmarshalText(b))
 
-	mtx2 = mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
-
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
-
-	// number of entries != M * N, should fail
-	in = []byte(`%%MatrixMarket matrix array real general
-              4 5
-	      0
-	      0
-	      1
-	      0
-	      0
-	      1
-	      0
-	      0
-	      0
-	      0
-	      0
-	      1
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      999`)
-
-	m2 := NewDense(mat.NewDense(4, 5, nil))
-
-	if err := m2.UnmarshalText(in); err != ErrInputScanError {
-		t.Errorf("Expected ErrInputScanError; received: %v", err)
-		return
-	}
+	assert.True(t, mat.Equal(mm.ToMatrix(), mtx10))
 }
 
 func TestDenseUnmarshalTextFrom(t *testing.T) {
 
-	var (
-		in         []byte
-		m          Dense
-		mtx1, mtx2 mat.Matrix
-	)
+	M, N := mtx10.Dims()
 
-	// just a good matrix
-	in = []byte(`%%MatrixMarket matrix array real general
-              4 5
-	      0
-	      0
-	      1
-	      0
-	      0
-	      1
-	      0
-	      0
-	      0
-	      0
-	      0
-	      1
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0
-	      0`)
+	mtx := mat.NewDense(M, N, nil)
+	mm := NewDense(mtx)
 
-	r := bytes.NewReader(in)
+	r, err := os.Open(filepath.Join("testdata", "mmtype-10.mtx"))
+	assert.Nil(t, err)
 
-	n, err := m.UnmarshalTextFrom(r)
-	if err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	_, err = mm.UnmarshalTextFrom(r)
+	assert.Nil(t, err)
 
-	if n != len(in) {
-		t.Errorf("Inconsistent number bytes read (%d), expected %d", n, len(in))
-		return
-	}
-
-	mtx1 = m.ToMatrix()
-
-	mtx2 = mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
-
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
+	assert.True(t, mat.Equal(mm.ToMatrix(), mtx10))
 }

@@ -40,7 +40,7 @@ func TestNewCOO(t *testing.T) {
 
 	m := NewCOO(mtx01)
 
-	assert.True(t, mat.Equal(m.ToMatrix(), dense))
+	assert.True(t, mat.Equal(m.ToMatrix(), mtx01))
 }
 
 func TestCOOMarshalTextTo(t *testing.T) {
