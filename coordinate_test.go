@@ -1,227 +1,103 @@
 package market
 
 import (
-	"bytes"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/james-bowman/sparse"
+	"github.com/stretchr/testify/assert"
 	"gonum.org/v1/gonum/mat"
+)
+
+var mtx01 = sparse.NewCOO(
+	4,
+	5,
+	[]int{0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3},
+	[]int{0, 1, 3, 4, 0, 2, 3, 4, 0, 1, 2, 0, 1, 3, 4},
+	[]float64{
+		+0.944853346337906500,
+		-0.681501551465435000,
+		+0.402696290353813800,
+		+0.328601067704537230,
+		+0.812079966562488300,
+		+0.756536462138819500,
+		+0.011573183932084063,
+		-0.551271155078584300,
+		+0.207552675260212820,
+		+0.795981993703873700,
+		-0.242048667319836990,
+		+0.419371027177237500,
+		+0.885613734373423400,
+		+0.669421525553018500,
+		+0.393836704188575100,
+	},
 )
 
 func TestNewCOO(t *testing.T) {
 
-	var (
-		c          *sparse.COO
-		m          *COO
-		mtx1, mtx2 mat.Matrix
-	)
+	m := NewCOO(mtx01)
 
-	c = sparse.NewCOO(4, 5, nil, nil, nil)
-	c.Set(0, 2, 1)
-	c.Set(1, 0, 1)
-	c.Set(2, 1, 1)
-
-	m = NewCOO(c)
-	mtx1 = m.ToMatrix()
-	mtx2 = mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
-
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\n \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
-}
-
-func TestCOOMarshalText(t *testing.T) {
-
-	var (
-		b      strings.Builder
-		c      *sparse.COO
-		m1, m2 *COO
-	)
-
-	c = sparse.NewCOO(4, 5, nil, nil, nil)
-	c.Set(0, 2, 1)
-	c.Set(1, 0, 1)
-	c.Set(2, 1, 1)
-
-	m1 = NewCOO(c)
-
-	_, err := m1.MarshalTextTo(&b)
-	if err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
-
-	r := strings.NewReader(b.String())
-
-	m2 = NewCOO(sparse.NewCOO(4, 5, nil, nil, nil))
-
-	if _, err := m2.UnmarshalTextFrom(r); err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
-
-	if !(mat.Equal(m1.ToMatrix(), m2.ToMatrix())) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(m1.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(m2.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
-
+	assert.True(t, mat.Equal(m.ToMatrix(), dense))
 }
 
 func TestCOOMarshalTextTo(t *testing.T) {
 
-	var (
-		c      *sparse.COO
-		m1, m2 *COO
-		out    []byte
-	)
+	var b strings.Builder
 
-	c = sparse.NewCOO(4, 5, nil, nil, nil)
-	c.Set(0, 2, 1)
-	c.Set(1, 0, 1)
-	c.Set(2, 1, 1)
+	m := NewCOO(mtx01)
 
-	m1 = NewCOO(c)
+	_, err := m.MarshalTextTo(&b)
+	assert.Nil(t, err)
 
-	out, err := m1.MarshalText()
-	if err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	mm, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
+	assert.Nil(t, err)
 
-	m2 = NewCOO(sparse.NewCOO(4, 5, nil, nil, nil))
+	assert.Equal(t, b.String(), string(mm))
+}
 
-	if err := m2.UnmarshalText(out); err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+func TestCOOMarshalText(t *testing.T) {
 
-	if !(mat.Equal(m1.ToMatrix(), m2.ToMatrix())) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(m1.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(m2.ToMatrix(), mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
+	m := NewCOO(mtx01)
 
+	mm1, err := m.MarshalText()
+	assert.Nil(t, err)
+
+	mm2, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
+	assert.Nil(t, err)
+
+	assert.Equal(t, string(mm1), string(mm2))
 }
 
 func TestCOOUnmarshalText(t *testing.T) {
 
-	var (
-		in         []byte
-		m          COO
-		mtx1, mtx2 mat.Matrix
-	)
+	M, N := mtx01.Dims()
 
-	// just a good matrix
-	in = []byte(`%%MatrixMarket matrix coordinate real general
-              4 5 3
-              1 3 1
-              2 1 1
-              3 2 1`)
+	c := sparse.NewCOO(M, N, nil, nil, nil)
+	mm := NewCOO(c)
 
-	if err := m.UnmarshalText(in); err == nil {
-		mtx1 = m.ToMatrix()
-	} else {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	b, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
+	assert.Nil(t, err)
 
-	mtx2 = mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
+	assert.Nil(t, mm.UnmarshalText(b))
 
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
-
-	// duplicate coordinate entries, should still pass
-	in = []byte(`%%MatrixMarket matrix coordinate real general
-              4 5 4
-              1 3 0.5
-              1 3 0.5
-              2 1 1
-              3 2 1`)
-
-	if err := m.UnmarshalText(in); err == nil {
-		mtx1 = m.ToMatrix()
-	} else {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
-
-	mtx2 = mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
-
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
+	assert.True(t, mat.Equal(mm.ToMatrix(), mtx01))
 }
 
 func TestCOOUnmarshalTextFrom(t *testing.T) {
 
-	var (
-		in         []byte
-		m          COO
-		mtx1, mtx2 mat.Matrix
-	)
+	M, N := mtx01.Dims()
 
-	// just a good matrix
-	in = []byte(`%%MatrixMarket matrix coordinate real general
-              4 5 3
-              1 3 1
-              2 1 1
-              3 2 1`)
+	c := sparse.NewCOO(M, N, nil, nil, nil)
+	mm := NewCOO(c)
 
-	r := bytes.NewReader(in)
+	r, err := os.Open(filepath.Join("testdata", "mmtype-01.mtx"))
+	assert.Nil(t, err)
 
-	n, err := m.UnmarshalTextFrom(r)
-	if err != nil {
-		t.Errorf("Received unexpected error: %v", err.Error())
-		return
-	}
+	_, err = mm.UnmarshalTextFrom(r)
+	assert.Nil(t, err)
 
-	if n != len(in) {
-		t.Errorf("Inconsistent number bytes read (%d), expected %d", n, len(in))
-		return
-	}
-
-	mtx1 = m.ToMatrix()
-
-	mtx2 = mat.NewDense(
-		4, 5, []float64{0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-	)
-
-	if !(mat.Equal(mtx1, mtx2)) {
-		t.Errorf(
-			"matrices differ\nexpected \nm = %v\n\nreceived \nm = %v\n\n",
-			mat.Formatted(mtx1, mat.Prefix("    "), mat.Squeeze()),
-			mat.Formatted(mtx2, mat.Prefix("    "), mat.Squeeze()),
-		)
-		return
-	}
+	assert.True(t, mat.Equal(mm.ToMatrix(), mtx01))
 }

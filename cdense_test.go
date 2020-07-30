@@ -72,7 +72,7 @@ func TestCDenseMarshalTextTo(t *testing.T) {
 		return
 	}
 
-	if !(mat.CEqualApprox(m1.ToCMatrix(), m2.ToCMatrix(), tol)) {
+	if !(mat.CEqual(m1.ToCMatrix(), m2.ToCMatrix())) {
 		t.Errorf("matrices differ")
 		return
 	}
@@ -99,7 +99,7 @@ func TestCDenseMarshalText(t *testing.T) {
 		return
 	}
 
-	if !(mat.CEqualApprox(m1.ToCMatrix(), m2.ToCMatrix(), tol)) {
+	if !(mat.CEqual(m1.ToCMatrix(), m2.ToCMatrix())) {
 		t.Errorf("matrices differ")
 		return
 	}
@@ -150,7 +150,7 @@ func TestCDenseUnmarshalText(t *testing.T) {
 	mtx2 := mat.NewCDense(4, 5, nil)
 	_, _ = mtx2.Copy(cdense)
 
-	if !(mat.CEqualApprox(mtx1, mtx2, tol)) {
+	if !(mat.CEqual(mtx1, mtx2)) {
 		t.Errorf("matrices differ")
 		return
 	}
@@ -207,7 +207,7 @@ func TestCDenseUnmarshalTextFrom(t *testing.T) {
 	mtx2 := mat.NewCDense(4, 5, nil)
 	_, _ = mtx2.Copy(cdense)
 
-	if !(mat.CEqualApprox(mtx1, mtx2, tol)) {
+	if !(mat.CEqual(mtx1, mtx2)) {
 		t.Errorf("matrices differ")
 		return
 	}
