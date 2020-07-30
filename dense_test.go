@@ -41,6 +41,20 @@ func TestNewDense(t *testing.T) {
 	assert.True(t, mat.Equal(m.ToMatrix(), mtx10))
 }
 
+func TestDenseToDense(t *testing.T) {
+
+	m := NewDense(mtx10)
+
+	assert.True(t, mat.Equal(m.ToDense(), mtx10))
+}
+
+func TestDenseToMatrix(t *testing.T) {
+
+	m := NewDense(mtx10)
+
+	assert.True(t, mat.Equal(m.ToMatrix(), mtx10))
+}
+
 func TestDenseMarshalTextTo(t *testing.T) {
 
 	var b strings.Builder

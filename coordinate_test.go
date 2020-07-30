@@ -43,6 +43,20 @@ func TestNewCOO(t *testing.T) {
 	assert.True(t, mat.Equal(m.ToMatrix(), mtx01))
 }
 
+func TestCOOToCOO(t *testing.T) {
+
+	m := NewCOO(mtx01)
+
+	assert.True(t, mat.Equal(m.ToCOO(), mtx01))
+}
+
+func TestCOOToMatrix(t *testing.T) {
+
+	m := NewCOO(mtx01)
+
+	assert.True(t, mat.Equal(m.ToMatrix(), mtx01))
+}
+
 func TestCOOMarshalTextTo(t *testing.T) {
 
 	var b strings.Builder

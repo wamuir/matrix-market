@@ -41,6 +41,20 @@ func TestNewCDense(t *testing.T) {
 	assert.True(t, mat.CEqual(m.ToCMatrix(), mtx16))
 }
 
+func TestCDenseToCDense(t *testing.T) {
+
+	m := NewCDense(mtx16)
+
+	assert.True(t, mat.CEqual(m.ToCDense(), mtx16))
+}
+
+func TestCDenseToCMatrix(t *testing.T) {
+
+	m := NewCDense(mtx16)
+
+	assert.True(t, mat.CEqual(m.ToCDense(), mtx16))
+}
+
 func TestCDenseMarshalTextTo(t *testing.T) {
 
 	var b strings.Builder
