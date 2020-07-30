@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func sts(s string) *bufio.Scanner {
@@ -14,60 +16,51 @@ func sts(s string) *bufio.Scanner {
 
 func TestScanHeader(t *testing.T) {
 
+	var (
+		h   *mmType
+		err error
+	)
+
 	// example valid coordinate-integer header
-	if h, err := scanHeader(sts(`%%MatrixMarket matrix coordinate integer skew-symmetric`)); err != nil {
-		t.Errorf(err.Error())
-	} else if !(h.isSparse() && h.isInteger() && h.isSkew()) {
-		t.Errorf("Header elements failed to evaluate")
-	}
+	h, err = scanHeader(sts(`%%MatrixMarket matrix coordinate integer skew-symmetric`))
+	assert.Nil(t, err)
+	assert.True(t, (h.isSparse() && h.isInteger() && h.isSkew()))
 
 	// example valid coordinate-pattern header
-	if h, err := scanHeader(sts(`%%MatrixMarket matrix coordinate pattern symmetric`)); err != nil {
-		t.Errorf(err.Error())
-	} else if !(h.isSparse() && h.isPattern() && h.isSymmetric()) {
-		t.Errorf("Header elements failed to evaluate")
-	}
+	h, err = scanHeader(sts(`%%MatrixMarket matrix coordinate pattern symmetric`))
+	assert.Nil(t, err)
+	assert.True(t, (h.isSparse() && h.isPattern() && h.isSymmetric()))
 
 	// example valid array-complex header
-	if h, err := scanHeader(sts(`%%MatrixMarket matrix array complex hermitian`)); err != nil {
-		t.Errorf(err.Error())
-	} else if !(h.isDense() && h.isComplex() && h.isHermitian()) {
-		t.Errorf("Header elements failed to evaluate")
-	}
+	h, err = scanHeader(sts(`%%MatrixMarket matrix array complex hermitian`))
+	assert.Nil(t, err)
+	assert.True(t, (h.isDense() && h.isComplex() && h.isHermitian()))
 
 	// empty header
-	if _, err := scanHeader(sts(``)); err == nil {
-		t.Errorf("Expected EOF error, received: %v", err)
-	}
+	_, err = scanHeader(sts(``))
+	assert.EqualError(t, err, ErrInputScanError.Error())
 
 	// too few fields in header
-	if _, err := scanHeader(sts(`%%MatrixMarket coordinate integer general`)); err == nil {
-		t.Errorf("Expected EOF error, received: %v", err)
-	}
+	_, err = scanHeader(sts(`%%MatrixMarket coordinate integer general`))
+	assert.EqualError(t, err, ErrPrematureEOF.Error())
 
 	// superfluous field(s) in header (expect to be discarded)
-	if _, err := scanHeader(sts(`%%MatrixMarket matrix coordinate integer general extra`)); err != nil {
-		t.Errorf("Expected nil error, received: %v", err)
-	}
+	_, err = scanHeader(sts(`%%MatrixMarket matrix coordinate integer general extra`))
+	assert.Nil(t, err)
 
 	// malformed banner
-	if _, err := scanHeader(sts(`MatrixMarket matrix coordinate integer general`)); err != ErrNoHeader {
-		t.Errorf("Expected NO_HEADER error, received: %v", err)
-	}
+	_, err = scanHeader(sts(`MatrixMarket matrix coordinate integer general`))
+	assert.EqualError(t, err, ErrNoHeader.Error())
 
 	// unsupported object field
-	if _, err := scanHeader(sts(`%%MatrixMarket xirtam coordinate integer general`)); err == nil {
-		t.Errorf("Expected EOF error, received: %v", err)
-	}
+	_, err = scanHeader(sts(`%%MatrixMarket xirtam coordinate integer general`))
+	assert.EqualError(t, err, ErrUnsupportedType.Error())
 
 	// invalid field combination (real and hermitian)
-	if _, err := scanHeader(sts(`%%MatrixMarket matrix coordinate real hermitian`)); err != ErrUnsupportedType {
-		t.Errorf("Expected UNSUPPORTED_TYPE error, received: %v", err)
-	}
+	_, err = scanHeader(sts(`%%MatrixMarket matrix coordinate real hermitian`))
+	assert.EqualError(t, err, ErrUnsupportedType.Error())
 
 	// invalid field combination (array and pattern)
-	if _, err := scanHeader(sts(`%%MatrixMarket matrix array pattern general`)); err != ErrUnsupportedType {
-		t.Errorf("Expected UNSUPPORTED_TYPE error, received: %v", err)
-	}
-
+	_, err = scanHeader(sts(`%%MatrixMarket matrix array pattern general`))
+	assert.EqualError(t, err, ErrUnsupportedType.Error())
 }
