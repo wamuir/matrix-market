@@ -1,7 +1,7 @@
 # matrix-market
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/wamuir/matrix-market.svg)](https://pkg.go.dev/github.com/wamuir/matrix-market)
-[![Build Status](https://travis-ci.com/wamuir/matrix-market.svg?branch=master)](https://travis-ci.com/wamuir/matrix-market)
+[![Build Status](https://github.com/wamuir/matrix-market/actions/workflows/go.yml/badge.svg?branch=master&event=push)](https://github.com/wamuir/matrix-market/actions/workflows/go.yml?query=event%3Apush+branch%3Amaster)
 [![codecov](https://codecov.io/gh/wamuir/matrix-market/branch/master/graph/badge.svg)](https://codecov.io/gh/wamuir/matrix-market)
 [![Go Report Card](https://goreportcard.com/badge/github.com/wamuir/matrix-market)](https://goreportcard.com/report/github.com/wamuir/matrix-market)
 
