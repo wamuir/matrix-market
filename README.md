@@ -51,15 +51,15 @@ exchanging matrix data.
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Coordinate | Real    | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
-| Matrix | Coordinate | Real    | Skew-Symmetric | Planned   |                                                                           |                                                                          |
-| Matrix | Coordinate | Real    | Symmetric      | Planned   |                                                                           |                                                                          |
+| Matrix | Coordinate | Real    | Skew-Symmetric | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
+| Matrix | Coordinate | Real    | Symmetric      | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
 
 #### Sparse Integer-Valued Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Coordinate | Integer | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
-| Matrix | Coordinate | Integer | Skew-Symmetric | Planned   |
-| Matrix | Coordinate | Integer | Symmetric      | Planned   |
+| Matrix | Coordinate | Integer | Skew-Symmetric | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
+| Matrix | Coordinate | Integer | Symmetric      | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
 
 #### Sparse Complex-Valued Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
@@ -73,7 +73,7 @@ exchanging matrix data.
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Coordinate | Pattern | General        | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
-| Matrix | Coordinate | Pattern | Symmetric      | Planned   |                                                                           |                                                                          |
+| Matrix | Coordinate | Pattern | Symmetric      | *Yes*     | [market.COO](https://godoc.org/github.com/wamuir/matrix-market#COO)       | [sparse.COO](https://godoc.org/github.com/james-bowman/sparse#COO)       |
 
 
 ## Dense Matrices (Array Format)
