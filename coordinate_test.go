@@ -36,6 +36,64 @@ var mtx01 = sparse.NewCOO(
 	},
 )
 
+var mtx02 = sparse.NewCOO(
+	5,
+	5,
+	[]int{0, 1, 2, 2, 3, 3, 4, 4, 4, 1, 1, 0, 2},
+	[]int{0, 1, 1, 2, 1, 3, 0, 2, 4, 2, 3, 4, 4},
+	[]float64{
+		+11.0,
+		+22.0,
+		+23.0,
+		+33.0,
+		+24.0,
+		+44.0,
+		+15.0,
+		+35.0,
+		+55.0,
+		+23.0,
+		+24.0,
+		+15.0,
+		+35.0,
+	},
+)
+
+var mtx03 = sparse.NewCOO(
+	5,
+	5,
+	[]int{3, 4, 4, 1, 0, 2},
+	[]int{1, 0, 2, 3, 4, 4},
+	[]float64{24.0, 15.0, 35.0, -24.0, -15.0, -35.0},
+)
+
+var mtx04 = sparse.NewCOO(
+	4,
+	5,
+	[]int{0, 1, 2},
+	[]int{2, 0, 1},
+	[]float64{8, -2, 3},
+)
+
+var mtx05 = mtx02
+
+var mtx06 = mtx03
+
+var mtx21 = sparse.NewCOO(
+	4,
+	5,
+	[]int{0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3},
+	[]int{0, 1, 3, 4, 0, 2, 3, 4, 0, 1, 2, 0, 1, 3, 4},
+	[]float64{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+)
+
+var mtx22 = sparse.NewCOO(
+	5,
+	5,
+	[]int{0, 1, 2, 2, 3, 3, 4, 4, 4, 1, 1, 0, 2},
+	[]int{0, 1, 1, 2, 1, 3, 0, 2, 4, 2, 3, 4, 4},
+	[]float64{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+)
+
 func TestNewCOO(t *testing.T) {
 
 	m := NewCOO(mtx01)
@@ -102,16 +160,34 @@ func TestCOOUnmarshalText(t *testing.T) {
 
 func TestCOOUnmarshalTextFrom(t *testing.T) {
 
-	M, N := mtx01.Dims()
+	c := map[string]mat.Matrix{
+		"mmtype-01.mtx": mtx01, // real general
+		"mmtype-02.mtx": mtx02, // real symmetric
+		"mmtype-03.mtx": mtx03, // real skew-symmetric
+		"mmtype-04.mtx": mtx04, // integer general
+		"mmtype-05.mtx": mtx05, // integer symmetric
+		"mmtype-06.mtx": mtx06, // integer skew-symmetric
+		"mmtype-21.mtx": mtx21, // pattern general
+		"mmtype-22.mtx": mtx22, // pattern symmetric
+	}
 
-	c := sparse.NewCOO(M, N, nil, nil, nil)
-	mm := NewCOO(c)
+	for k, v := range c {
 
-	r, err := os.Open(filepath.Join("testdata", "mmtype-01.mtx"))
-	assert.Nil(t, err)
+		f, _ := os.Open(filepath.Join("testdata", k))
+		defer f.Close()
 
-	_, err = mm.UnmarshalTextFrom(r)
-	assert.Nil(t, err)
+		var mm COO
+		if _, err := mm.UnmarshalTextFrom(f); err != nil {
+			t.Errorf("%v", err)
+		}
 
-	assert.True(t, mat.Equal(mm.ToMatrix(), mtx01))
+		if !mat.Equal(mm.ToMatrix(), v) {
+			t.Errorf(
+				"\ngot:\n    %s\nwant:\n    %s\n",
+				mat.Formatted(mm.ToCOO(), mat.Prefix("    "), mat.Squeeze()),
+				mat.Formatted(v, mat.Prefix("    "), mat.Squeeze()),
+			)
+		}
+	}
+
 }
