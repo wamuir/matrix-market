@@ -11,18 +11,22 @@ const maxScanTokenSize = 64 * 1024
 const matrixMktBanner = `%%MatrixMarket`
 
 const (
+	// object
 	mtxObjectMatrix = "matrix"
 
+	// format
 	mtxFormatArray      = "array"
 	mtxFormatCoordinate = "coordinate"
 	mtxFormatDense      = "array"
 	mtxFormatSparse     = "coordinate"
 
+	// field
 	mtxFieldComplex = "complex"
 	mtxFieldInteger = "integer"
 	mtxFieldPattern = "pattern"
 	mtxFieldReal    = "real"
 
+	// symmetry
 	mtxSymmetryGeneral   = "general"
 	mtxSymmetryHermitian = "hermitian"
 	mtxSymmetrySkew      = "skew-symmetric"
@@ -32,37 +36,37 @@ const (
 // Errors returned by failures to read a matrix
 var (
 	ErrInputScanError  = fmt.Errorf("error while scanning matrix input")
-	ErrLineTooLong     = fmt.Errorf("input line exceed maximum length ")
+	ErrLineTooLong     = fmt.Errorf("input line exceeds maximum length")
 	ErrPrematureEOF    = fmt.Errorf("required header items are missing")
 	ErrNoHeader        = fmt.Errorf("missing matrix market header line")
-	ErrNotMTX          = fmt.Errorf("input is not a matrix market")
+	ErrNotMTX          = fmt.Errorf("input is not a matrix market file")
 	ErrUnsupportedType = fmt.Errorf("unrecognizable matrix description")
-	ErrUnwritable      = fmt.Errorf("unable to write matrix to writer")
+	ErrUnwritable      = fmt.Errorf("error writing matrix to io writer")
 )
 
-var supported = []mmType{
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetrySymm},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetrySkew},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetryHermitian},
-	{mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetryHermitian},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetryGeneral},
-	{mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetrySymm},
+var supported = map[int]mmType{
+	1:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetryGeneral},
+	2:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySymm},
+	3:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldReal, mtxSymmetrySkew},
+	4:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetryGeneral},
+	5:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetrySymm},
+	6:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldInteger, mtxSymmetrySkew},
+	7:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetryGeneral},
+	8:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetrySymm},
+	9:  {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetrySkew},
+	10: {mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetryGeneral},
+	11: {mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetrySymm},
+	12: {mtxObjectMatrix, mtxFormatArray, mtxFieldReal, mtxSymmetrySkew},
+	13: {mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetryGeneral},
+	14: {mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetrySymm},
+	15: {mtxObjectMatrix, mtxFormatArray, mtxFieldInteger, mtxSymmetrySkew},
+	16: {mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetryGeneral},
+	17: {mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetrySymm},
+	18: {mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetrySkew},
+	19: {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldComplex, mtxSymmetryHermitian},
+	20: {mtxObjectMatrix, mtxFormatArray, mtxFieldComplex, mtxSymmetryHermitian},
+	21: {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetryGeneral},
+	22: {mtxObjectMatrix, mtxFormatCoordinate, mtxFieldPattern, mtxSymmetrySymm},
 }
 
 type mmType struct {
@@ -129,6 +133,18 @@ func (t *mmType) isSupported() bool {
 	}
 
 	return false
+}
+
+// index returns the (one-indexed) index of the Matrix Market type or -1
+func (t *mmType) index() int {
+
+	for i, t2 := range supported {
+		if t.isMMType(&t2) {
+			return i
+		}
+	}
+
+	return -1
 }
 
 // scanHeader scans one line from a scanner and attempts to parse as a
