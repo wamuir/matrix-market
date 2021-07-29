@@ -1,0 +1,12 @@
+%%MatrixMarket matrix coordinate real symmetric
+%
+ 5  5  9
+ 1  1  11.0
+ 2  2  22.0
+ 3  2  23.0
+ 3  3  33.0
+ 4  2  24.0
+ 4  4  44.0
+ 5  1  15.0
+ 5  3  35.0
+ 5  5  55.0
