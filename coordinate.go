@@ -237,8 +237,7 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 		k++
 	}
 
-	// check if number of non-empty rows read is equal to expected
-	// count of non-zero rows
+	// compare counter k against expected number of expected entries L
 	if k != L {
 		return ErrInputScanError
 	}
