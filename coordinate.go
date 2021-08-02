@@ -129,19 +129,16 @@ func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
 		return n.total, err
 	}
 
+	// apply header fields
+	m.Object = t.Object
+	m.Format = t.Format
+	m.Field = t.Field
+	m.Symmetry = t.Symmetry
+
 	switch t.index() {
 
-	case 1, 2, 3, 4, 5, 6:
+	case 1, 2, 3, 4, 5, 6, 21, 22:
 		if err := m.scanCoordinateData(scanner); err != nil {
-			return n.total, err
-		}
-
-		if err := scanner.Err(); err != nil {
-			return n.total, err
-		}
-
-	case 21, 22:
-		if err := m.scanPatternData(scanner); err != nil {
 			return n.total, err
 		}
 
@@ -152,24 +149,6 @@ func (m *COO) UnmarshalTextFrom(r io.Reader) (int, error) {
 	default:
 		return n.total, ErrUnsupportedType
 
-	}
-
-	if t.isSymmetric() {
-		m.mat.DoNonZero(func(i, j int, v float64) {
-			if i == j {
-				return
-			}
-			m.mat.Set(j, i, v)
-		})
-	}
-
-	if t.isSkew() {
-		m.mat.DoNonZero(func(i, j int, v float64) {
-			if i == j {
-				return
-			}
-			m.mat.Set(j, i, -v)
-		})
 	}
 
 	return n.total, nil
@@ -188,8 +167,7 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 			continue
 		}
 
-		_, err := fmt.Sscanf(line, "%d %d %d", &M, &N, &L)
-		if err != nil {
+		if _, err := fmt.Sscanf(line, "%d %d %d", &M, &N, &L); err != nil {
 			return ErrInputScanError
 		}
 
@@ -219,78 +197,42 @@ func (m *COO) scanCoordinateData(scanner *bufio.Scanner) error {
 			return ErrInputScanError
 		}
 
-		_, err := fmt.Sscanf(line, "%d %d %f", &i, &j, &v)
-		if err != nil {
-			return err
+		switch m.Field {
+
+		case mtxFieldInteger, mtxFieldReal:
+
+			if _, err := fmt.Sscanf(line, "%d %d %f", &i, &j, &v); err != nil {
+				return err
+			}
+
+		case mtxFieldPattern:
+
+			v = 1.0
+
+			if _, err := fmt.Sscanf(line, "%d %d", &i, &j); err != nil {
+				return err
+			}
+		}
+
+		switch m.Symmetry {
+
+		case mtxSymmetrySymm:
+
+			// if off diagonal, set value for symm element
+			if i != j {
+				c.Set(j-1, i-1, v)
+			}
+
+		case mtxSymmetrySkew:
+
+			// if off diagonal, set skew value for symm element
+			// (note. diagonal elements aren't allowed for skew mats)
+			if i != j {
+				c.Set(j-1, i-1, -v)
+			}
 		}
 
 		c.Set(i-1, j-1, v)
-
-		k++
-	}
-
-	// check if number of non-empty rows read is equal to expected
-	// count of non-zero rows
-	if k != L {
-		return ErrInputScanError
-	}
-
-	if err := scanner.Err(); err != nil {
-		return ErrInputScanError
-	}
-
-	m.mat = c
-
-	return nil
-}
-
-func (m *COO) scanPatternData(scanner *bufio.Scanner) error {
-
-	var M, N, L, k int
-
-	for scanner.Scan() {
-
-		line := scanner.Text()
-
-		// blank line or comment (%, Unicode 37)
-		if r := []rune(line); len(r) == 0 || r[0] == 37 {
-			continue
-		}
-
-		_, err := fmt.Sscanf(line, "%d %d %d", &M, &N, &L)
-		if err != nil {
-			return ErrInputScanError
-		}
-
-		break
-
-	}
-
-	c := sparse.NewCOO(M, N, make([]int, L), make([]int, L), make([]float64, L))
-
-	for scanner.Scan() {
-
-		var i, j int
-
-		line := scanner.Text()
-
-		// blank lines are allowed in data per design spec
-		if r := []rune(line); len(r) == 0 {
-			continue
-		}
-
-		// error out if data rows exceed expected non-zero entries
-		// (note that k is zero indexed)
-		if k == L {
-			return ErrInputScanError
-		}
-
-		_, err := fmt.Sscanf(line, "%d %d", &i, &j)
-		if err != nil {
-			return err
-		}
-
-		c.Set(i-1, j-1, 1)
 
 		k++
 	}
