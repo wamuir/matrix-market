@@ -82,15 +82,15 @@ exchanging matrix data.
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Array      | Real    | General        | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
-| Matrix | Array      | Real    | Skew-Symmetric | Planned   |                                                                           |                                                                          |
-| Matrix | Array      | Real    | Symmetric      | Planned   |                                                                           |                                                                          |
+| Matrix | Array      | Real    | Skew-Symmetric | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
+| Matrix | Array      | Real    | Symmetric      | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
 
 #### Dense Integer-Valued Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Array      | Integer | General        | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
-| Matrix | Array      | Integer | Skew-Symmetric | Planned   |                                                                           |                                                                          |
-| Matrix | Array      | Integer | Symmetric      | Planned   |                                                                           |                                                                          |
+| Matrix | Array      | Integer | Skew-Symmetric | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
+| Matrix | Array      | Integer | Symmetric      | *Yes*     | [market.Dense](https://godoc.org/github.com/wamuir/matrix-market#Dense)   | [mat.Dense](https://godoc.org/gonum.org/v1/gonum/mat#Dense)              |
 
 #### Dense Complex-Valued Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
