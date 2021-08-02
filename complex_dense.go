@@ -74,9 +74,9 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 		return total, ErrUnwritable
 	}
 
-	for i := 0; i < M; i++ {
+	for j := 0; j < N; j++ {
 
-		for j := 0; j < N; j++ {
+		for i := 0; i < M; i++ {
 
 			v := m.mat.At(i, j)
 
@@ -124,16 +124,26 @@ func (m *CDense) UnmarshalTextFrom(r io.Reader) (int, error) {
 		return n.total, err
 	}
 
-	if !(t.isMatrix() && t.isArray() && t.isComplex() && t.isGeneral()) {
+	// apply header fields
+	m.Object = t.Object
+	m.Format = t.Format
+	m.Field = t.Field
+	m.Symmetry = t.Symmetry
+
+	switch t.index() {
+
+	case 16, 17, 18, 20:
+		if err := m.scanArrayData(scanner); err != nil {
+			return n.total, err
+		}
+
+		if err := scanner.Err(); err != nil {
+			return n.total, err
+		}
+
+	default:
 		return n.total, ErrUnsupportedType
-	}
 
-	if err := m.scanArrayData(scanner); err != nil {
-		return n.total, err
-	}
-
-	if err := scanner.Err(); err != nil {
-		return n.total, err
 	}
 
 	return n.total, nil
@@ -141,7 +151,7 @@ func (m *CDense) UnmarshalTextFrom(r io.Reader) (int, error) {
 
 func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 
-	var M, N, L, k int
+	var M, N, k int
 
 	for scanner.Scan() {
 
@@ -156,8 +166,6 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 		if err != nil {
 			return ErrInputScanError
 		}
-
-		L = M * N
 
 		break
 	}
@@ -177,7 +185,7 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 
 		// error out if data rows exceed expected non-zero entries
 		// (note that k is zero indexed)
-		if k == L {
+		if k == M*N {
 			return ErrInputScanError
 		}
 
@@ -186,14 +194,58 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 			return ErrInputScanError
 		}
 
-		d.Set(int(k/N), k%N, complex(vr, vi))
+		switch m.Symmetry {
 
+		case mtxSymmetrySymm:
+
+			// if above diagonal, move to diag
+			for k%M < int(k/M) {
+				k++
+			}
+
+			// if off diagonal, set value for symm element
+			if int(k/M) != k%M {
+				d.Set(int(k/M), k%M, complex(vr, vi))
+			}
+
+		case mtxSymmetrySkew:
+
+			// if on or above diagonal, move below diag
+			for k%M <= int(k/M) {
+				k++
+			}
+
+			// set skew value for symm element
+			d.Set(int(k/M), k%M, -complex(vr, vi))
+
+		case mtxSymmetryHermitian:
+
+			// if above diagonal, move to diag
+			for k%M < int(k/M) {
+				k++
+			}
+
+			// if off diagonal, set value for symm element
+			if int(k/M) != k%M {
+				d.Set(int(k/M), k%M, complex(vr, -vi))
+			}
+		}
+
+		d.Set(k%M, int(k/M), complex(vr, vi))
 		k++
 	}
 
-	// check if number of non-empty rows read is equal to expected
-	// count of non-zero rows
-	if k != L {
+	// as skew-symmetric entries are below the diagonal in the matrix
+	// market specification, there are no entries in the last column. The
+	// counter k must must be advanced by one full column for
+	// skew-symmetric matrices prior to the check which follows, otherwise
+	// k == M * (N - 1) and the check will fail.
+	if m.Symmetry == mtxSymmetrySkew {
+		k += M
+	}
+
+	// compare counter k against expected number of entries (matrix size)
+	if k != M*N {
 		return ErrInputScanError
 	}
 
