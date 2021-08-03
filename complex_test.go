@@ -181,30 +181,34 @@ func TestCDenseUnmarshalText(t *testing.T) {
 
 func TestCDenseUnmarshalTextFrom(t *testing.T) {
 
-        c := map[string]mat.CMatrix{
-                "mmtype-16.mtx": mtx16, // complex general
-                "mmtype-17.mtx": mtx17, // complex symmetric
-                "mmtype-18.mtx": mtx18, // complex skew-symmetric
-                "mmtype-20.mtx": mtx20, // complex hermitian
-        }
+	c := map[string]mat.CMatrix{
+		"mmtype-07.mtx": mtx16, // coordinate complex general
+		"mmtype-08.mtx": mtx17, // coordinate complex symmetric
+		"mmtype-09.mtx": mtx18, // coordinate complex skew-symmetric
+		"mmtype-19.mtx": mtx20, // coordinate complex hermitian
+		"mmtype-16.mtx": mtx16, // array complex general
+		"mmtype-17.mtx": mtx17, // array complex symmetric
+		"mmtype-18.mtx": mtx18, // array complex skew-symmetric
+		"mmtype-20.mtx": mtx20, // array complex hermitian
+	}
 
-        for k, v := range c {
+	for k, v := range c {
 
-                f, _ := os.Open(filepath.Join("testdata", k))
-                defer f.Close()
+		f, _ := os.Open(filepath.Join("testdata", k))
+		defer f.Close()
 
-                var mm CDense
-                if _, err := mm.UnmarshalTextFrom(f); err != nil {
-                        t.Errorf("%v", err)
-                }
+		var mm CDense
+		if _, err := mm.UnmarshalTextFrom(f); err != nil {
+			t.Errorf("%v", err)
+		}
 
-                if !mat.CEqual(mm.ToCMatrix(), v) {
-                        t.Errorf(
-                                "\ngot:\n    %v\nwant:\n    %v\n",
+		if !mat.CEqualApprox(mm.ToCMatrix(), v, 1e-14) {
+			t.Errorf(
+				"\ngot:\n    %v\nwant:\n    %v\n",
 				mm.ToCMatrix(),
 				v,
-                        )
-                }
-        }
+			)
+		}
+	}
 
 }

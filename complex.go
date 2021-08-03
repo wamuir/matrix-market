@@ -132,6 +132,15 @@ func (m *CDense) UnmarshalTextFrom(r io.Reader) (int, error) {
 
 	switch t.index() {
 
+	case 7, 8, 9, 19:
+		if err := m.scanCoordinateData(scanner); err != nil {
+			return n.total, err
+		}
+
+		if err := scanner.Err(); err != nil {
+			return n.total, err
+		}
+
 	case 16, 17, 18, 20:
 		if err := m.scanArrayData(scanner); err != nil {
 			return n.total, err
@@ -162,8 +171,7 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 			continue
 		}
 
-		_, err := fmt.Sscanf(line, "%d %d", &M, &N)
-		if err != nil {
+		if _, err := fmt.Sscanf(line, "%d %d", &M, &N); err != nil {
 			return ErrInputScanError
 		}
 
@@ -189,8 +197,7 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 			return ErrInputScanError
 		}
 
-		_, err := fmt.Sscanf(line, "%f %f", &vr, &vi)
-		if err != nil {
+		if _, err := fmt.Sscanf(line, "%f %f", &vr, &vi); err != nil {
 			return ErrInputScanError
 		}
 
@@ -246,6 +253,98 @@ func (m *CDense) scanArrayData(scanner *bufio.Scanner) error {
 
 	// compare counter k against expected number of entries (matrix size)
 	if k != M*N {
+		return ErrInputScanError
+	}
+
+	if err := scanner.Err(); err != nil {
+		return ErrInputScanError
+	}
+
+	m.mat = d
+
+	return nil
+}
+
+func (m *CDense) scanCoordinateData(scanner *bufio.Scanner) error {
+
+	var M, N, L, k int
+
+	for scanner.Scan() {
+
+		line := scanner.Text()
+
+		// blank line or comment (%, Unicode 37)
+		if r := []rune(line); len(r) == 0 || r[0] == 37 {
+			continue
+		}
+
+		if _, err := fmt.Sscanf(line, "%d %d %d", &M, &N, &L); err != nil {
+			return ErrInputScanError
+		}
+
+		break
+
+	}
+
+	d := mat.NewCDense(M, N, nil)
+
+	for scanner.Scan() {
+
+		var (
+			i, j   int
+			vr, vi float64
+		)
+
+		line := scanner.Text()
+
+		// blank lines are allowed in data per design spec
+		if r := []rune(line); len(r) == 0 {
+			continue
+		}
+
+		// error out if data rows exceed expected non-zero entries
+		// (note that k is zero indexed)
+		if k == L {
+			return ErrInputScanError
+		}
+
+		if _, err := fmt.Sscanf(line, "%d %d %f %f", &i, &j, &vr, &vi); err != nil {
+			return ErrInputScanError
+		}
+
+		switch m.Symmetry {
+
+		case mtxSymmetrySymm:
+
+			// if off diagonal, set value for symm element
+			if i != j {
+				d.Set(j-1, i-1, complex(vr, vi))
+			}
+
+		case mtxSymmetrySkew:
+
+			// if off diagonal, set skew value for symm element
+			// (note. diagonal elements aren't allowed for skew mats)
+			if i != j {
+				d.Set(j-1, i-1, -complex(vr, vi))
+			}
+
+		case mtxSymmetryHermitian:
+
+			// if off diagonal, set value for symm element
+			if i != j {
+				d.Set(j-1, i-1, complex(vr, -vi))
+			}
+
+		}
+
+		d.Set(i-1, j-1, complex(vr, vi))
+
+		k++
+	}
+
+	// compare counter k against expected number of expected entries L
+	if k != L {
 		return ErrInputScanError
 	}
 
