@@ -96,9 +96,9 @@ exchanging matrix data.
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Array      | Complex | General        | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
-| Matrix | Array      | Complex | Hermitian      | Planned   |                                                                           |                                                                          |
-| Matrix | Array      | Complex | Skew-Symmetric | Planned   |                                                                           |                                                                          |
-| Matrix | Array      | Complex | Symmetric      | Planned   |                                                                           |                                                                          |
+| Matrix | Array      | Complex | Hermitian      | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
+| Matrix | Array      | Complex | Skew-Symmetric | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
+| Matrix | Array      | Complex | Symmetric      | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
 
 
 
