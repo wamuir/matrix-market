@@ -65,9 +65,9 @@ exchanging matrix data.
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
 | ------ | ---------- | ------- | -------------- | :-------: | :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
 | Matrix | Coordinate | Complex | General        | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
-| Matrix | Coordinate | Complex | Hermitian      | Planned   |                                                                           |                                                                          |
-| Matrix | Coordinate | Complex | Skew-Symmetric | Planned   |                                                                           |                                                                          |
-| Matrix | Coordinate | Complex | Symmetric      | Planned   |                                                                           |                                                                          |
+| Matrix | Coordinate | Complex | Hermitian      | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
+| Matrix | Coordinate | Complex | Skew-Symmetric | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
+| Matrix | Coordinate | Complex | Symmetric      | *Yes*     | [market.CDense](https://godoc.org/github.com/wamuir/matrix-market#CDense) | [mat.CDense](https://godoc.org/gonum.org/v1/gonum/mat#CDense)            |
 
 #### Sparse Pattern Matrices
 | Object | Format     | Field   | Symmetry       | Supported | Concrete Type                                                             | Storage                                                                  |
