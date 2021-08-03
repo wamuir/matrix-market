@@ -14,12 +14,23 @@ func sts(s string) *bufio.Scanner {
 	return bufio.NewScanner(r)
 }
 
+func TestMmTypeIndex(t *testing.T) {
+
+	var n mmType
+	assert.Equal(t, n.index(), -1)
+}
+
 func TestScanHeader(t *testing.T) {
 
 	var (
 		h   *mmType
 		err error
 	)
+
+	// example valid arry real general
+	h, err = scanHeader(sts(`%%MatrixMarket matrix array real general`))
+	assert.Nil(t, err)
+	assert.True(t, (h.isArray() && h.isReal() && h.isGeneral()))
 
 	// example valid coordinate-integer header
 	h, err = scanHeader(sts(`%%MatrixMarket matrix coordinate integer skew-symmetric`))
