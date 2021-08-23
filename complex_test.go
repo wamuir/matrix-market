@@ -1,7 +1,10 @@
 package market
 
 import (
+	"fmt"
+	"io"
 	"io/ioutil"
+	"math/cmplx"
 	"os"
 	"path/filepath"
 	"strings"
@@ -211,4 +214,35 @@ func TestCDenseUnmarshalTextFrom(t *testing.T) {
 		}
 	}
 
+}
+
+func BenchmarkCDenseMarshalTextTo(b *testing.B) {
+	for i := 1; i <= 1000; i *= 10 {
+		a := mat.NewCDense(i, i, nil)
+		for j := 0; j < i*i; j++ {
+			a.Set(j%i, int(j/i), cmplx.Sqrt(complex(float64(j), float64(j))))
+		}
+		m := NewCDense(a)
+		b.Run(fmt.Sprintf("%d", i), func(b *testing.B) {
+			for k := 0; k < b.N; k++ {
+				m.MarshalTextTo(io.Discard)
+			}
+		})
+	}
+}
+
+func BenchmarkCDenseUnmarshalTextFrom(b *testing.B) {
+	for i := 1; i <= 1000; i *= 10 {
+		a := mat.NewCDense(i, i, nil)
+		for j := 0; j < i*i; j++ {
+			a.Set(j%i, int(j/i), cmplx.Sqrt(complex(float64(j), float64(j))))
+		}
+		m := NewCDense(a)
+		t, _ := m.MarshalText()
+		b.Run(fmt.Sprintf("%d", i), func(b *testing.B) {
+			for k := 0; k < b.N; k++ {
+				m.UnmarshalText(t)
+			}
+		})
+	}
 }
