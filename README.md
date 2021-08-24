@@ -1,5 +1,6 @@
 # matrix-market
 
+![Project Stability: Experimental](https://img.shields.io/badge/stability-experimental-critical.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/wamuir/matrix-market.svg)](https://pkg.go.dev/github.com/wamuir/matrix-market)
 [![Build Status](https://github.com/wamuir/matrix-market/actions/workflows/go.yml/badge.svg?branch=master&event=push)](https://github.com/wamuir/matrix-market/actions/workflows/go.yml?query=event%3Apush+branch%3Amaster)
 [![codecov](https://codecov.io/gh/wamuir/matrix-market/branch/master/graph/badge.svg)](https://codecov.io/gh/wamuir/matrix-market)
