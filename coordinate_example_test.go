@@ -27,10 +27,11 @@ func ExampleCOO_MarshalText() {
 	fmt.Println(string(mm))
 	// output:
 	// %%MatrixMarket matrix coordinate real general
-	// 4 5 3
-	// 1 1 0.9448533463379065
-	// 2 2 0.8975666640458155
-	// 3 3 0.4026962903538138
+	// %
+	//  4  5  3
+	//  1  1  0.9448533463379065
+	//  2  2  0.8975666640458155
+	//  3  3  0.4026962903538138
 }
 
 func ExampleCOO_UnmarshalText() {
@@ -38,10 +39,10 @@ func ExampleCOO_UnmarshalText() {
 	// mm is a real-valued sparse matrix in Matrix Market coordinate format
 	mm := []byte(
 		`%%MatrixMarket matrix coordinate real general
-		 3 3 3
-		 1 1 0.9448533463379065
-		 2 2 0.8975666640458155
-		 3 3 0.4026962903538138`,
+		  3  3  3
+		  1  1  0.9448533463379065
+		  2  2  0.8975666640458155
+		  3  3  0.4026962903538138`,
 	)
 
 	// mtx is a coo matrix representation

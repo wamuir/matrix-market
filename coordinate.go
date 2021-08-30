@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	// "strconv"
 	"strings"
 
 	"github.com/james-bowman/sparse"
@@ -30,6 +31,10 @@ func NewCOO(c *sparse.COO) *COO {
 		Symmetry: mtxSymmetryGeneral,
 		mat:      c,
 	}
+}
+
+func (m *COO) Do(fn func(i, j int, v float64)) {
+	m.mat.DoNonZero(fn)
 }
 
 // ToCOO returns a sparse.COO matrix that shared underlying storage
@@ -73,25 +78,26 @@ func (m *COO) MarshalTextTo(w io.Writer) (int, error) {
 	}
 
 	M, N := m.mat.Dims()
-	if n, err := fmt.Fprintf(w, "%d %d %d\n", M, N, m.mat.NNZ()); err == nil {
+	if n, err := fmt.Fprintf(w, "%%\n %d  %d  %d\n", M, N, m.mat.NNZ()); err == nil {
 		total += n
 	} else {
 		return total, ErrUnwritable
 	}
 
-	var err error
+	var a floatTripletAligner
+	m.Do(a.Fit('f', -1, 64))
+
+	// entries in column major order
+	var (
+		buf = make([]byte, 0, 64)
+		err error
+		n   int
+	)
 	m.mat.DoNonZero(func(i, j int, v float64) {
+		buf = a.Append(buf[:0], i, j, v, 'f', -1, 64)
+		buf = append(buf, '\n')
 
-		if err != nil {
-			return
-		}
-
-		n, e := fmt.Fprintf(w, "%d %d %g\n", i+1, j+1, v)
-		if e != nil {
-			err = ErrUnwritable
-			return
-		}
-
+		n, err = w.Write(buf)
 		total += n
 	})
 

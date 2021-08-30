@@ -32,6 +32,15 @@ func NewCDense(d *mat.CDense) *CDense {
 	}
 }
 
+func (m *CDense) Do(fn func(i, j int, v complex128)) {
+	M, N := m.mat.Dims()
+	for j := 0; j < N; j++ {
+		for i := 0; i < M; i++ {
+			fn(i, j, m.mat.At(i, j))
+		}
+	}
+}
+
 // ToCDense returns a mat.CDense matrix that shares underlying storage
 // with the receiver.
 func (m *CDense) ToCDense() *mat.CDense { return m.mat }
@@ -68,26 +77,31 @@ func (m *CDense) MarshalTextTo(w io.Writer) (int, error) {
 	}
 
 	M, N := m.mat.Dims()
-	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
+	if n, err := fmt.Fprintf(w, "%%\n %d  %d\n", M, N); err == nil {
 		total += n
 	} else {
 		return total, ErrUnwritable
 	}
 
+	var a cmplxAligner
+	m.Do(a.Fit('f', -1, 128))
+
+	// entries in column major order
+	var buf = make([]byte, 0, 128)
 	for j := 0; j < N; j++ {
 
 		for i := 0; i < M; i++ {
 
-			v := m.mat.At(i, j)
+			buf = a.Append(buf[:0], m.mat.At(i, j), 'f', -1, 128)
+			buf = append(buf, '\n')
 
-			n, err := fmt.Fprintf(w, "%g %g\n", real(v), imag(v))
+			n, err := w.Write(buf)
 			if err != nil {
 				return total, ErrUnwritable
 			}
 
 			total += n
 		}
-
 	}
 
 	return total, nil

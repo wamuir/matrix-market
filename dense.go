@@ -32,6 +32,15 @@ func NewDense(d *mat.Dense) *Dense {
 	}
 }
 
+func (m *Dense) Do(fn func(i, j int, v float64)) {
+	M, N := m.mat.Dims()
+	for j := 0; j < N; j++ {
+		for i := 0; i < M; i++ {
+			fn(i, j, m.mat.At(i, j))
+		}
+	}
+}
+
 // ToDense returns a mat.Dense matrix that shares underlying storage
 // with the receiver.
 func (m *Dense) ToDense() *mat.Dense { return m.mat }
@@ -68,25 +77,31 @@ func (m *Dense) MarshalTextTo(w io.Writer) (int, error) {
 	}
 
 	M, N := m.mat.Dims()
-	if n, err := fmt.Fprintf(w, "%d %d\n", M, N); err == nil {
+	if n, err := fmt.Fprintf(w, "%%\n %d  %d\n", M, N); err == nil {
 		total += n
 	} else {
 		return total, ErrUnwritable
 	}
 
+	var a floatAligner
+	m.Do(a.Fit('f', -1, 64))
+
 	// entries in column major order
+	var buf = make([]byte, 0, 64)
 	for j := 0; j < N; j++ {
 
 		for i := 0; i < M; i++ {
 
-			n, err := fmt.Fprintf(w, "%g\n", m.mat.At(i, j))
+			buf = a.Append(buf[:0], m.mat.At(i, j), 'f', -1, 64)
+			buf = append(buf, '\n')
+
+			n, err := w.Write(buf)
 			if err != nil {
 				return total, ErrUnwritable
 			}
 
 			total += n
 		}
-
 	}
 
 	return total, nil
