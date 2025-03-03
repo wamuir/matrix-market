@@ -3,7 +3,6 @@ package market
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/cmplx"
 	"os"
 	"path/filepath"
@@ -151,7 +150,7 @@ func TestCDenseMarshalTextTo(t *testing.T) {
 	_, err := m.MarshalTextTo(&b)
 	assert.Nil(t, err)
 
-	mm, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-16.mtx"))
+	mm, err := os.ReadFile(filepath.Join("testdata", "mmtype-16.mtx"))
 	assert.Nil(t, err)
 
 	assert.Equal(t, b.String(), string(mm))
@@ -164,7 +163,7 @@ func TestCDenseMarshalText(t *testing.T) {
 	mm1, err := m.MarshalText()
 	assert.Nil(t, err)
 
-	mm2, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-16.mtx"))
+	mm2, err := os.ReadFile(filepath.Join("testdata", "mmtype-16.mtx"))
 	assert.Nil(t, err)
 
 	assert.Equal(t, string(mm1), string(mm2))
@@ -174,7 +173,7 @@ func TestCDenseUnmarshalText(t *testing.T) {
 
 	var mm CDense
 
-	b, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-16.mtx"))
+	b, err := os.ReadFile(filepath.Join("testdata", "mmtype-16.mtx"))
 	assert.Nil(t, err)
 
 	assert.Nil(t, mm.UnmarshalText(b))
@@ -225,7 +224,10 @@ func BenchmarkCDenseMarshalTextTo(b *testing.B) {
 		m := NewCDense(a)
 		b.Run(fmt.Sprintf("%d", i), func(b *testing.B) {
 			for k := 0; k < b.N; k++ {
-				m.MarshalTextTo(io.Discard)
+				_, err := m.MarshalTextTo(io.Discard)
+				if err != nil {
+					b.Fatal(err)
+				}
 			}
 		})
 	}
@@ -241,7 +243,9 @@ func BenchmarkCDenseUnmarshalTextFrom(b *testing.B) {
 		t, _ := m.MarshalText()
 		b.Run(fmt.Sprintf("%d", i), func(b *testing.B) {
 			for k := 0; k < b.N; k++ {
-				m.UnmarshalText(t)
+				if err := m.UnmarshalText(t); err != nil {
+					b.Fatal(err)
+				}
 			}
 		})
 	}

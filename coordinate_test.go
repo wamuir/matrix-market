@@ -3,7 +3,6 @@ package market
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -127,7 +126,7 @@ func TestCOOMarshalTextTo(t *testing.T) {
 	_, err := m.MarshalTextTo(&b)
 	assert.Nil(t, err)
 
-	mm, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
+	mm, err := os.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
 	assert.Nil(t, err)
 
 	assert.Equal(t, b.String(), string(mm))
@@ -140,7 +139,7 @@ func TestCOOMarshalText(t *testing.T) {
 	mm1, err := m.MarshalText()
 	assert.Nil(t, err)
 
-	mm2, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
+	mm2, err := os.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
 	assert.Nil(t, err)
 
 	assert.Equal(t, string(mm1), string(mm2))
@@ -153,7 +152,7 @@ func TestCOOUnmarshalText(t *testing.T) {
 	c := sparse.NewCOO(M, N, nil, nil, nil)
 	mm := NewCOO(c)
 
-	b, err := ioutil.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
+	b, err := os.ReadFile(filepath.Join("testdata", "mmtype-01.mtx"))
 	assert.Nil(t, err)
 
 	assert.Nil(t, mm.UnmarshalText(b))
@@ -207,7 +206,10 @@ func BenchmarkCOOMarshalTextTo(b *testing.B) {
 		m := NewCOO(a)
 		b.Run(fmt.Sprintf("%d", i), func(b *testing.B) {
 			for k := 0; k < b.N; k++ {
-				m.MarshalTextTo(io.Discard)
+				_, err := m.MarshalTextTo(io.Discard)
+				if err != nil {
+					b.Fatal(err)
+				}
 			}
 		})
 	}
@@ -226,7 +228,9 @@ func BenchmarkCOOUnmarshalTextFrom(b *testing.B) {
 		t, _ := m.MarshalText()
 		b.Run(fmt.Sprintf("%d", i), func(b *testing.B) {
 			for k := 0; k < b.N; k++ {
-				m.UnmarshalText(t)
+				if err := m.UnmarshalText(t); err != nil {
+					b.Fatal(err)
+				}
 			}
 		})
 	}

@@ -93,9 +93,7 @@ func (a floatAligner) Append(dst []byte, v float64, fmt byte, p int, bitSize int
 }
 
 func (a floatAligner) PaddedAppend(dst []byte, v float64, fmt byte, p int, bitSize int) []byte {
-	var l int
-
-	l = len(dst)
+	var l int = len(dst)
 	for i := 0; i < a[0]-characteristic(v); i++ {
 		dst = append(dst, ' ')
 	}
